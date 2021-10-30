@@ -1,0 +1,21 @@
+<?php
+
+/**
+* Copy this file needs to be in the Impl directory, rename it to Hasher.php, 
+* add this: <'password' => new \App\Security\Impl\Hasher(),>
+* to config/security.php, without these brackets <>
+* if there is already a line with 'password' ..., just replace it
+* 
+*/
+
+namespace App\Security\Impl;
+
+use \App\Security\ISecurity;
+
+class Hasher implements ISecurity
+{
+	public function hashPassword($password)
+	{
+		return hash('sha256', "Chenge this to something like ACOUÉAfÖZ+'RP(ÖRH" + $password + "Change this too");
+	}
+}
