@@ -4,6 +4,8 @@ An old CMS of mine that was originally written for/in laravel now ported to (rcp
 
 This is highly experimental stuff. It probably shouldn't be used by anyone who's sane.
 
+Note: this readme has been taken from an another project of mine, it will be updated later.
+
 ## Compilation
 
 Will only work on linux! Works on the rasberry pi.
@@ -69,9 +71,6 @@ Now just open http://127.0.0.1:8080
 
 You can push floats to the "a/b" MQTT topics, and the new values will be save in the `database.sqlite` file, and will appear
 in your browser.
-
-If you have mosqitto installed you can use the `publish_random_data.py` or `publish_data.sh` scripts to automatically
-push things into the proper MQTT topic.
 
 ## Structure
 
