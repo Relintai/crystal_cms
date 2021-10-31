@@ -36,9 +36,10 @@ folders = [
 ]
 
 module_folders = [
-    '../modules',
     '../custom_modules',
 ]
+
+databases=True
 
 main_file = 'main.cpp'
 
@@ -58,7 +59,7 @@ exports = {
     'javascript': [],
 }
 
-engine_repository = [ ['https://github.com/Relintai/rcpp_framework.git', 'git@github.com:Relintai/rcpp_framework.git'], 'engine', '' ]
+engine_repository = [ ['https://github.com/Relintai/rcpp_cms.git', 'git@github.com:Relintai/rcpp_cms.git'], 'engine', '' ]
 
 module_repositories = [
 ]
@@ -336,18 +337,13 @@ if len(sys.argv) > 1:
         if 'v' in arg:
             build_string += 'vsproj=yes'
 
+        if databases:
+            build_string += " databases=yes "
+
         build_string += 'folders="'
 
         for f in folders:
             build_string += '../' + f
-            build_string += ';'
-
-        build_string += '" '
-
-        build_string += 'module_folders="'
-
-        for f in module_folders:
-            build_string += f
             build_string += ';'
 
         build_string += '" '
