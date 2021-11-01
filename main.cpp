@@ -73,8 +73,6 @@ int main(int argc, char **argv) {
 
 	DWebApplication *app = new MAIN_CLASS();
 
-	session_manager->load_sessions();
-
 	app->load_settings();
 	app->setup_routes();
 	app->setup_middleware();
@@ -83,6 +81,8 @@ int main(int argc, char **argv) {
 	LOG_INFO << "Server running on 127.0.0.1:8080";
 
 	if (!migrate) {
+		session_manager->load_sessions();
+
 		printf("Initialized!\n");
 		app->run();
 	} else {
