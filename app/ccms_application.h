@@ -5,10 +5,16 @@
 #include "core/object.h"
 #include "modules/drogon/web_application.h"
 
+#undef LOG_TRACE
+#undef LOG_WARN
+
 #include "modules/list_page/list_page.h"
 #include "modules/message_page/message_page.h"
 #include "modules/paged_article/paged_article.h"
 #include "modules/paged_list/paged_list.h"
+
+class AdminPanel;
+class RBACController;
 
 #define ENSURE_LOGIN(request)                  \
 	if (!is_logged_in(request)) {              \
@@ -44,6 +50,7 @@ public:
 	static void add_menu(Request *request, const MenuEntries index);
 
 	static void village_page_func(Object *instance, Request *request);
+	static void admin_page_func(Object *instance, Request *request);
 	static void user_page_func(Object *instance, Request *request);
 
 	virtual void setup_routes();
@@ -55,6 +62,9 @@ public:
 
 	CCMSApplication();
 	~CCMSApplication();
+
+	AdminPanel *_admin_panel; 
+	RBACController *_rbac_controller;
 
 	static std::string menu_head;
 	static std::string footer;

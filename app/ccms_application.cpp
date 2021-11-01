@@ -17,6 +17,9 @@
 #include "modules/users/user.h"
 #include "modules/users/user_controller.h"
 
+#include "modules/admin_panel/admin_panel.h"
+#include "modules/rbac/rbac_controller.h"
+
 bool CCMSApplication::is_logged_in(Request *request) {
 	if (!request->session) {
 		return false;
@@ -209,6 +212,10 @@ void CCMSApplication::village_page_func(Object *instance, Request *request) {
 	request->compile_and_send_body();
 }
 
+void CCMSApplication::admin_page_func(Object *instance, Request *request) {
+	AdminPanel::get_singleton()->handle_request_main(request);
+}
+
 void CCMSApplication::user_page_func(Object *instance, Request *request) {
 	if (is_logged_in(request)) {
 		add_menu(request, MENUENTRY_SETTINGS);
@@ -221,7 +228,7 @@ void CCMSApplication::setup_routes() {
 	DWebApplication::setup_routes();
 
 	index_func = HandlerInstance(index);
-	main_route_map["village"] = HandlerInstance(village_page_func);
+	main_route_map["admin"] = HandlerInstance(admin_page_func);
 	main_route_map["user"] = HandlerInstance(user_page_func);
 }
 
@@ -263,10 +270,17 @@ void CCMSApplication::compile_menu() {
 CCMSApplication::CCMSApplication() :
 		DWebApplication() {
 
+	_rbac_controller = new RBACController();
+
+	_admin_panel = new AdminPanel();
+	_admin_panel->register_admin_controller("rbac", _rbac_controller);
+	
 	compile_menu();
 }
 
 CCMSApplication::~CCMSApplication() {
+	delete _admin_panel;
+	delete _rbac_controller;
 }
 
 std::string CCMSApplication::menu_head = "";
