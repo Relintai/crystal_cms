@@ -15,6 +15,7 @@
 
 class AdminPanel;
 class RBACController;
+class RBACModel;
 
 #define ENSURE_LOGIN(request)                  \
 	if (!is_logged_in(request)) {              \
@@ -65,6 +66,7 @@ public:
 
 	AdminPanel *_admin_panel; 
 	RBACController *_rbac_controller;
+	RBACModel *_rbac_model;
 
 	static std::string menu_head;
 	static std::string footer;
