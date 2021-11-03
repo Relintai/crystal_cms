@@ -26,6 +26,7 @@
 #include "modules/users/user_model.h"
 
 #include "core/database/database_manager.h"
+#include "platform/platform_initializer.h"
 
 void initialize_backends() {
 	initialize_database_backends();
@@ -41,6 +42,8 @@ void create_databases() {
 }
 
 int main(int argc, char **argv) {
+	PlatformInitializer::allocate_all();
+
 	initialize_backends();
 
 	bool migrate = false;
@@ -101,6 +104,8 @@ int main(int argc, char **argv) {
 	delete user_controller;
 	delete user_model;
 	delete session_manager;
+
+	PlatformInitializer::free_all();
 
 	return 0;
 }
