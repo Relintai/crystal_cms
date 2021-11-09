@@ -21,12 +21,14 @@
 //Backends
 #include "backends/hash_hashlib/setup.h"
 
-#include "modules/users/user.h"
 #include "app/ccms_user_controller.h"
+#include "modules/users/user.h"
 #include "modules/users/user_model.h"
 
 #include "core/database/database_manager.h"
 #include "platform/platform_initializer.h"
+
+#include "core/os/platform.h"
 
 void initialize_backends() {
 	initialize_database_backends();
@@ -41,8 +43,9 @@ void create_databases() {
 	db->connect("database.sqlite");
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv, char **envp) {
 	PlatformInitializer::allocate_all();
+	PlatformInitializer::arg_setup(argc, argv, envp);
 
 	initialize_backends();
 
@@ -82,7 +85,7 @@ int main(int argc, char **argv) {
 
 	app->add_listener("127.0.0.1", 8080);
 	LOG_INFO << "Server running on 127.0.0.1:8080";
-
+	
 	if (!migrate) {
 		session_manager->load_sessions();
 
