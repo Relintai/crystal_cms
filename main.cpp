@@ -23,7 +23,7 @@
 
 #include "app/ccms_user_controller.h"
 #include "modules/users/user.h"
-#include "modules/users/user_model.h"
+#include "modules/rbac_users/rbac_user_model.h"
 
 #include "core/database/database_manager.h"
 #include "platform/platform_initializer.h"
@@ -63,7 +63,7 @@ int main(int argc, char **argv, char **envp) {
 
 	//todo init these in the module automatically
 	UserController *user_controller = new CCMSUserController();
-	UserModel *user_model = new UserModel();
+	RBACUserModel *user_model = new RBACUserModel();
 	//user_manager->set_path("./users/");
 
 	Settings *settings = new Settings(true);

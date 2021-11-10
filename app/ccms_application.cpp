@@ -15,7 +15,8 @@
 #include "core/http/session_manager.h"
 
 #include "modules/users/user.h"
-#include "modules/users/user_controller.h"
+//#include "modules/users/user_controller.h"
+#include "modules/rbac_users/rbac_user_controller.h"
 
 #include "modules/admin_panel/admin_panel.h"
 #include "modules/rbac/rbac_controller.h"
@@ -235,7 +236,9 @@ void CCMSApplication::setup_routes() {
 
 void CCMSApplication::setup_middleware() {
 	middlewares.push_back(HandlerInstance(::SessionManager::session_setup_middleware));
-	middlewares.push_back(HandlerInstance(::UserController::user_session_setup_middleware));
+	//middlewares.push_back(HandlerInstance(::UserController::user_session_setup_middleware));
+	//middlewares.push_back(HandlerInstance(::RBACUserController::rbac_user_session_setup_middleware));
+	middlewares.push_back(HandlerInstance(::RBACUserController::rbac_default_user_session_middleware));
 
 	DWebApplication::setup_middleware();
 }

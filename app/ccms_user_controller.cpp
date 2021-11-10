@@ -184,7 +184,7 @@ void CCMSUserController::render_settings_request(Ref<User> &user, Request *reque
 }
 
 CCMSUserController::CCMSUserController() :
-		UserController() {
+		RBACUserController() {
 }
 
 CCMSUserController::~CCMSUserController() {
