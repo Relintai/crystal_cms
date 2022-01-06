@@ -18,12 +18,12 @@
 
 #include "modules/drogon/web_application.h"
 
-//Backends
+// Backends
 #include "backends/hash_hashlib/setup.h"
 
 #include "app/ccms_user_controller.h"
-#include "modules/users/user.h"
 #include "modules/rbac_users/rbac_user_model.h"
+#include "modules/users/user.h"
 
 #include "core/database/database_manager.h"
 #include "platform/platform_initializer.h"
@@ -49,25 +49,15 @@ int main(int argc, char **argv, char **envp) {
 
 	initialize_backends();
 
-	bool migrate = false;
-
-	for (int i = 1; i < argc; ++i) {
-		const char *a = argv[i];
-
-		if (a[0] == 'm') {
-			migrate = true;
-		}
-	}
-
 	::SessionManager *session_manager = new ::SessionManager();
 
-	//todo init these in the module automatically
+	// todo init these in the module automatically
 	UserController *user_controller = new CCMSUserController();
 	RBACUserModel *user_model = new RBACUserModel();
-	//user_manager->set_path("./users/");
+	// user_manager->set_path("./users/");
 
 	Settings *settings = new Settings(true);
-	//settings->parse_file("settings.json");
+	// settings->parse_file("settings.json");
 
 	FileCache *file_cache = new FileCache(true);
 	file_cache->wwwroot = "./www";
@@ -85,7 +75,9 @@ int main(int argc, char **argv, char **envp) {
 
 	app->add_listener("127.0.0.1", 8080);
 	LOG_INFO << "Server running on 127.0.0.1:8080";
-	
+
+	bool migrate = Platform::get_singleton()->arg_parser.has_arg("-m");
+
 	if (!migrate) {
 		session_manager->load_sessions();
 
@@ -96,6 +88,11 @@ int main(int argc, char **argv, char **envp) {
 
 		session_manager->migrate();
 		user_model->migrate();
+
+		if (Platform::get_singleton()->arg_parser.has_arg("-u")) {
+			printf("Creating test users.\n");
+			user_model->create_test_users();
+		}
 
 		app->migrate();
 	}
