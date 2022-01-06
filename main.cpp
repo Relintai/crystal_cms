@@ -10,7 +10,8 @@
 
 #include "database/db_init.h"
 
-#include "core/settings.h"
+#include "core/settings/settings.h"
+#include "core/settings/db_settings.h"
 
 #include "core/http/session_manager.h"
 
@@ -56,7 +57,7 @@ int main(int argc, char **argv, char **envp) {
 	RBACUserModel *user_model = new RBACUserModel();
 	// user_manager->set_path("./users/");
 
-	Settings *settings = new Settings(true);
+	DBSettings *settings = new DBSettings(true);
 	// settings->parse_file("settings.json");
 
 	FileCache *file_cache = new FileCache(true);
@@ -79,12 +80,15 @@ int main(int argc, char **argv, char **envp) {
 	bool migrate = Platform::get_singleton()->arg_parser.has_arg("-m");
 
 	if (!migrate) {
+		settings->load();
 		session_manager->load_sessions();
 
 		printf("Initialized!\n");
 		app->run();
 	} else {
 		printf("Running migrations.\n");
+
+		settings->migrate();
 
 		session_manager->migrate();
 		user_model->migrate();
