@@ -25,6 +25,8 @@
 
 #include "core/os/platform.h"
 
+#include "menu/menu_node.h"
+
 bool CCMSRoot::is_logged_in(Request *request) {
 	if (!request->session) {
 		return false;
@@ -291,9 +293,14 @@ CCMSRoot::CCMSRoot() :
 	_rbac_controller = new RBACController();
 	_rbac_controller->initialize();
 
+	_menu = new MenuNode();
+
 	_admin_panel = new AdminPanel();
 	_admin_panel->register_admin_controller("rbac", _rbac_controller);
+	_admin_panel->register_admin_controller("menu", _menu);
+
 	_admin_panel->add_child(_rbac_controller);
+	_admin_panel->add_child(_menu);
 
 	add_child(_admin_panel);
 
@@ -303,6 +310,7 @@ CCMSRoot::CCMSRoot() :
 CCMSRoot::~CCMSRoot() {
 	delete _admin_panel;
 	delete _rbac_controller;
+	delete _menu;
 	delete _user_controller;
 }
 
