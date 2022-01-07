@@ -33,10 +33,11 @@ import traceback
 
 folders = [
     'app',
+    'app/menu',
 ]
 
 module_folders = [
-    '../custom_modules',
+    '../modules',
 ]
 
 databases=True
