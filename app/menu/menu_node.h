@@ -53,6 +53,7 @@ public:
 
 	virtual void db_save(const Ref<MenuData> &menu);
 	virtual void db_save_menu_entry(const Ref<MenuDataEntry> &entry);
+	virtual void db_delete_menu_entry(const int id);
 
 	void create_table();
 	void drop_table();

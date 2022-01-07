@@ -166,7 +166,8 @@ void MenuNode::render_menuentry_view(Request *request, MenudminEntryViewData *da
 			b.w("Create Page?");
 			b.input_checkbox("create_page", "create_page")->checked()->f()->br();
 		}
-
+		
+		b.br();
 		b.input()->type("submit")->value("Save");
 	}
 	b.cform();
@@ -277,24 +278,45 @@ void MenuNode::admin_handle_down(Request *request) {
 }
 
 void MenuNode::admin_handle_delete(Request *request) {
-	/*
-			$id = $request->input('id');
+	String pid = request->get_parameter("id");
 
-			if (!$id || !is_numeric($id))
-			{
-				return redirect()->back();
+	if (!pid.is_int()) {
+		request->send_redirect(request->get_url_root_parent());
+		return;
+	}
+
+	int id = pid.to_int();
+
+	// TODO
+	// Also lock everywhere else
+	//_data->write_lock()
+
+	for (int i = 0; i < _data->entries.size(); ++i) {
+		Ref<MenuDataEntry> e = _data->entries[i];
+
+		if (e->id == id) {
+			int sort_order = e->sort_order;
+
+			for (int j = 0; j < _data->entries.size(); ++j) {
+				Ref<MenuDataEntry> be = _data->entries[j];
+
+				if (be->sort_order > sort_order) {
+					be->sort_order -= 1;
+					db_save_menu_entry(be);
+					break;
+				}
 			}
 
-			$current = Menu::findOrFail($id);
+			db_delete_menu_entry(e->id);
 
-			Log::info('MenuEntry deleted! Json: ' . $current->toJson());
+			_data->entries.remove_keep_order(i);
 
-			$current->delete();
+			break;
+		}
+	}
 
-			Menu::where('sort_order', '>', $current->sort_order)->decrement('sort_order', 1);
-
-			return redirect()->back();
-			*/
+	//_data->write_unlock()
+	request->send_redirect(request->get_url_root_parent());
 }
 
 String MenuNode::admin_get_section_name() {
@@ -455,6 +477,13 @@ void MenuNode::db_save_menu_entry(const Ref<MenuDataEntry> &entry) {
 		qb->run_query();
 		// qb->print();
 	}
+}
+
+void MenuNode::db_delete_menu_entry(const int id) {
+	Ref<QueryBuilder> qb = get_query_builder();
+
+	qb->del(_table)->where()->wp("id", id);
+	qb->run_query();
 }
 
 void MenuNode::create_table() {
