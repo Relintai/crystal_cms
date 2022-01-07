@@ -16,27 +16,24 @@ class MenuNode : public AdminNode {
 	RCPP_OBJECT(MenuNode, AdminNode);
 
 public:
-	void handle_request_main(Request *request);
+	virtual void render(Request *request);
+
 	void create_validators();
 
 	void admin_handle_request_main(Request *request);
 	String admin_get_section_name();
 	void admin_add_section_links(Vector<AdminSectionLinkInfo> *links);
 
-	struct RBACAdminRankViewData {
-		Ref<MenuData> rank;
-		Vector<String> messages;
+	void admin_render_menuentry_list(Request *request);
 
-		int id = 0;
-		String name = "";
-		String name_internal = "";
-		String settings = "";
-		int rank_permissions = 0;
+	struct MenudminEntryViewData {
+		Ref<MenuDataEntry> entry;
+		Vector<String> messages;
 	};
 
-	void admin_handle_new_rank(Request *request);
-	void admin_handle_edit_rank(Request *request);
-	void render_rank_view(Request *request, RBACAdminRankViewData *data);
+	void admin_handle_new_menuentry(Request *request);
+	void admin_handle_edit_menuentry(Request *request);
+	void render_menuentry_view(Request *request, MenudminEntryViewData *data);
 
 	struct RBACAdminEditPermissionView {
 		Ref<MenuData> rank;
@@ -52,7 +49,6 @@ public:
 	void admin_render_permission_editor_entry_edit_create_view(Request *request, RBACAdminEditPermissionView *data);
 	bool admin_process_permission_editor_entry_edit_create_post(Request *request, RBACAdminEditPermissionView *data);
 
-	void admin_render_rank_list(Request *request);
 	void admin_render_rank_editor(Request *request);
 
 	void initialize();
@@ -74,6 +70,8 @@ public:
 	void drop_table();
 	void migrate();
 	void create_default_entries();
+
+	void _notification(int what);
 
 	MenuNode();
 	~MenuNode();

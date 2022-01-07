@@ -15,7 +15,20 @@
 #include "core/database/query_result.h"
 #include "core/database/table_builder.h"
 
-void MenuNode::handle_request_main(Request *request) {
+void MenuNode::render(Request *request) {
+	/*
+	<div class="menu">
+		<ul class="menu">
+			@if (count($menu) > 0)
+			@foreach ($menu as $e)
+			<li class="menuentry">
+				{!! link_to($e->url, trans('menu.' . $e->name_key)) !!}
+			</li>
+			@endforeach
+			@endif
+		</ul>
+	</div>
+	*/
 }
 
 void MenuNode::create_validators() {
@@ -25,109 +38,97 @@ void MenuNode::admin_handle_request_main(Request *request) {
 	String seg = request->get_current_path_segment();
 
 	if (seg == "") {
-		admin_render_rank_list(request);
+		admin_render_menuentry_list(request);
 		return;
-	} else if (seg == "new_rank") {
+	} else if (seg == "new_entry") {
 		request->push_path();
 
-		admin_handle_new_rank(request);
-	} else if (seg == "edit_rank") {
+		admin_handle_new_menuentry(request);
+	} else if (seg == "edit_entry") {
 		request->push_path();
 
-		admin_handle_edit_rank(request);
-	} else if (seg == "permission_editor") {
-		request->push_path();
-
-		admin_permission_editor(request);
+		admin_handle_edit_menuentry(request);
 	}
 }
 
-void MenuNode::admin_handle_new_rank(Request *request) {
+void MenuNode::admin_handle_new_menuentry(Request *request) {
+	if (request->get_method() == HTTP_METHOD_POST) {
+		Ref<MenuDataEntry> entry;
+		entry.instance();
 
-	/*
-		if (request->get_method() == HTTP_METHOD_POST) {
-			Ref<RBACRank> rank;
-			rank.instance();
+		entry->name = request->get_parameter("name");
+		entry->url = request->get_parameter("url");
+		entry->sort_order = _data->entries.size() + 1;
 
-			rank->name = request->get_parameter("name");
-			rank->name_internal = request->get_parameter("name_internal");
-			rank->settings = request->get_parameter("settings");
+		db_save_menu_entry(entry);
 
-			RBACModel::get_singleton()->save_rank(rank);
+		_data->entries.push_back(entry);
 
-			_ranks[rank->id] = rank;
+		request->send_redirect(request->get_url_root_parent() + "edit_entry/" + String::num(entry->id));
 
-			request->send_redirect(request->get_url_root_parent() + "edit_rank/" + String::num(rank->id));
-			return;
-		}
+		return;
+	}
 
-		RBACAdminRankViewData data;
-		render_rank_view(request, &data);
-		*/
+	MenudminEntryViewData data;
+	render_menuentry_view(request, &data);
 }
 
-void MenuNode::admin_handle_edit_rank(Request *request) {
-	/*
+void MenuNode::admin_handle_edit_menuentry(Request *request) {
 	String seg = request->get_current_path_segment();
-
-	//check whether it's numeric
-	//if (!seg.is)
 
 	int id = seg.to_int();
 
-	if (id == 0) {
-		RLOG_MSG("MenuNode::admin_handle_edit_rank: id == 0!\n");
+	Ref<MenuDataEntry> entry;
+
+	for (int i = 0; i < _data->entries.size(); ++i) {
+		Ref<MenuDataEntry> e = _data->entries[i];
+
+		if (e->id == id) {
+			entry = e;
+			break;
+		}
+	}
+
+	if (!entry.is_valid()) {
+		RLOG_MSG("MenuNode::admin_handle_edit_menuentry: !entry.is_valid()\n");
 		request->send_redirect(request->get_url_root_parent());
 		return;
 	}
 
-	Ref<RBACRank> rank = _ranks[id];
-
-	if (!rank.is_valid()) {
-		RLOG_MSG("MenuNode::admin_handle_edit_rank: !rank.is_valid()\n");
-		request->send_redirect(request->get_url_root_parent());
-		return;
-	}
-
-	RBACAdminRankViewData data;
-	data.rank = rank;
+	MenudminEntryViewData data;
+	data.entry = entry;
 
 	if (request->get_method() == HTTP_METHOD_POST) {
-		rank->name = request->get_parameter("name");
-		rank->name_internal = request->get_parameter("name_internal");
-		rank->settings = request->get_parameter("settings");
+		entry->name = request->get_parameter("name");
+		entry->url = request->get_parameter("url");
 
-		RBACModel::get_singleton()->save_rank(rank);
+		db_save_menu_entry(entry);
 
 		data.messages.push_back("Save Success!");
 	}
 
-	render_rank_view(request, &data);
-	*/
+	render_menuentry_view(request, &data);
 }
 
-void MenuNode::render_rank_view(Request *request, RBACAdminRankViewData *data) {
-	/*
+void MenuNode::render_menuentry_view(Request *request, MenudminEntryViewData *data) {
 	int id = 0;
 	String name = "";
-	String name_internal = "";
-	String settings = "";
-	int base_permissions = 0;
-	int rank_permissions = 0;
+	String url = "";
+	int sort_order = 0;
+	bool editing = false;
 
-	if (data->rank.is_valid()) {
-		id = data->rank->id;
-		name = data->rank->name;
-		name_internal = data->rank->name_internal;
-		settings = data->rank->settings;
-		base_permissions = data->rank->base_permissions;
-		rank_permissions = data->rank->rank_permissions;
+	if (data->entry.is_valid()) {
+		id = data->entry->id;
+		name = data->entry->name;
+		url = data->entry->url;
+		sort_order = data->entry->sort_order;
+		editing = true;
 	}
 
 	HTMLBuilder b;
 
-	b.h4()->f()->a()->href(request->get_url_root_parent())->f()->w("<- Back")->ca()->ch4();
-	b.h4()->f()->w("RBAC Editor")->ch4();
+	b.h4()->f()->a()->href(request->get_url_root_parent())->f()->w("&lt;- Back")->ca()->ch4();
+	b.h4()->f()->w("Menu Editor")->ch4();
 
 	b.div()->cls("messages");
 	for (int i = 0; i < data->messages.size(); ++i) {
@@ -135,21 +136,30 @@ void MenuNode::render_rank_view(Request *request, RBACAdminRankViewData *data) {
 	}
 	b.cdiv();
 
-	b.form()->method("POST")->action(request->get_url_root() + String::num(id));
+	String aurl = request->get_url_root();
+
+	if (id != 0) {
+		aurl += String::num(id);
+	}
+
+	b.form()->method("POST")->action(aurl);
 	{
-		//b.input()->type("hidden")->name("id")->value(String::num(id))->f()->cinput();
 		b.w("Name:")->br();
-		b.input()->type("text")->name("name")->value(name)->f()->br();
-		b.w("Name (Internal):")->br();
-		b.input()->type("text")->name("name_internal")->value(name_internal)->f()->cinput()->br();
-		b.w("Custom Settings:")->br();
-		b.input()->type("text")->name("settings")->value(settings)->f()->cinput()->br();
+		b.input_text("name", name)->f()->br();
+
+		b.w("URL:")->br();
+		b.input_text("url", url)->f()->br();
+
+		if (!editing) {
+			b.w("Create Page?");
+			b.input_checkbox("create_page", "create_page")->checked()->f()->br();
+		}
+
 		b.input()->type("submit")->value("Save");
 	}
 	b.cform();
 
 	request->body += b.result;
-	*/
 }
 
 void MenuNode::admin_permission_editor(Request *request) {
@@ -239,7 +249,7 @@ void MenuNode::admin_render_permission_editor_main_view(Request *request, RBACAd
 
 	Ref<RBACRank> rank = data->rank;
 
-	b.h4()->f()->a()->href(request->get_url_root_parent(2))->f()->w("<- Back")->ca()->ch4();
+	b.h4()->f()->a()->href(request->get_url_root_parent(2))->f()->w("&lt;- Back")->ca()->ch4();
 	b.h4()->f()->w("RBAC Editor")->ch4();
 
 	b.div()->cls("heading");
@@ -298,7 +308,7 @@ void MenuNode::admin_render_permission_editor_entry_edit_create_view(Request *re
 		permissions = perm->permissions;
 	}
 
-	b.h4()->f()->a()->href(request->get_url_root_parent())->f()->w("<- Back")->ca()->ch4();
+	b.h4()->f()->a()->href(request->get_url_root_parent())->f()->w("&lt;- Back")->ca()->ch4();
 	b.h4()->f()->w("RBAC Editor")->ch4();
 	b.br();
 
@@ -367,45 +377,6 @@ bool MenuNode::admin_process_permission_editor_entry_edit_create_post(Request *r
 	return true;
 }
 
-void MenuNode::admin_render_rank_list(Request *request) {
-	/*
-	HTMLBuilder b;
-
-	b.h4()->f()->a()->href(request->get_url_root_parent())->f()->w("<- Back")->ca()->ch4();
-	b.h4()->f()->w("RBAC Editor")->ch4();
-
-	for (std::map<int, Ref<RBACRank> >::iterator p = _ranks.begin(); p != _ranks.end(); p++) {
-		Ref<RBACRank> r = p->second;
-
-		if (!r.is_valid()) {
-			continue;
-		}
-
-		b.div()->cls("row");
-		{
-			b.a()->href(request->get_url_root("permission_editor/") + String::num(r->id));
-			b.w("[ Id ]: ")->wn(r->id)->w(", [ Name ]: ")->w(r->name)->w(", [ Name Internal ]: ")->w(r->name_internal);
-			b.ca();
-
-			b.w(" - ");
-
-			b.a()->href(request->get_url_root("edit_rank/") + String::num(r->id));
-			b.w("[ Edit ]");
-			b.ca();
-		}
-		b.cdiv();
-	}
-
-	b.br();
-
-	b.a()->href(request->get_url_root("new_rank"));
-	b.w("New Rank");
-	b.ca();
-
-	request->body += b.result;
-	*/
-}
-
 void MenuNode::admin_render_rank_editor(Request *request) {
 }
 
@@ -415,6 +386,76 @@ String MenuNode::admin_get_section_name() {
 
 void MenuNode::admin_add_section_links(Vector<AdminSectionLinkInfo> *links) {
 	links->push_back(AdminSectionLinkInfo("Editor", ""));
+}
+
+void MenuNode::admin_render_menuentry_list(Request *request) {
+	HTMLBuilder b;
+
+	b.h4()->f()->a()->href(request->get_url_root_parent())->f()->w("&lt;- Back")->ca()->ch4();
+	b.h4()->f()->w("Menu Editor")->ch4();
+	b.style()->f()->w("li { display: inline-block; }")->cstyle();
+
+	for (int i = 0; i < _data->entries.size(); ++i) {
+		Ref<MenuDataEntry> e = _data->entries[i];
+
+		if (!e.is_valid()) {
+			continue;
+		}
+
+		b.div()->cls("row")->f()->ul();
+		{
+			b.li();
+			b.a()->href(request->get_url_root("edit_entry/") + String::num(e->id));
+			b.w("id: ")->wn(e->id)->w(" name: ")->w(e->name)->w(" url: ")->w(e->url);
+			b.ca();
+			b.cli();
+
+			b.li();
+			/*
+										@if ($i != 0)
+											{!! Form::open(array('url' => 'admin/menu_editor/up')) !!}
+											{!! Form::hidden('id', $menuentries[$i]->id) !!}
+											{!! Form::submit(trans('admin.up')) !!}
+											{!! Form::close() !!}
+										@else
+											{{ trans('admin.up') }}
+										@endif
+			*/
+			b.cli();
+
+			b.li();
+
+			/*
+										@if ($i + 1 != count($menuentries))
+											{!! Form::open(array('url' => 'admin/menu_editor/down')) !!}
+											{!! Form::hidden('id', $menuentries[$i]->id) !!}
+											{!! Form::submit(trans('admin.down')) !!}
+											{!! Form::close() !!}
+										@else
+											{{ trans('admin.down') }}
+										@endif
+										*/
+			b.cli();
+
+			b.li();
+			/*
+										{!! Form::open(array('url' => 'admin/menu_editor/delete')) !!}
+										{!! Form::hidden('id', $menuentries[$i]->id) !!}
+										{!! Form::submit(trans('admin.delete')) !!}
+										{!! Form::close() !!}
+			*/
+			b.cli();
+		}
+		b.cul()->cdiv();
+	}
+
+	b.br();
+
+	b.a()->href(request->get_url_root("new_entry"));
+	b.w("New Menu Entry");
+	b.ca();
+
+	request->body += b.result;
 }
 
 void MenuNode::initialize() {
@@ -520,6 +561,12 @@ void MenuNode::migrate() {
 }
 
 void MenuNode::create_default_entries() {
+}
+
+void MenuNode::_notification(int what) {
+	if (what == Node::NOTIFICATION_ENTER_TREE) {
+		initialize();
+	}
 }
 
 MenuNode::MenuNode() :
