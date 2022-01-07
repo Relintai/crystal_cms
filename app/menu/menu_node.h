@@ -35,22 +35,6 @@ public:
 	void admin_handle_edit_menuentry(Request *request);
 	void render_menuentry_view(Request *request, MenudminEntryViewData *data);
 
-	struct RBACAdminEditPermissionView {
-		Ref<MenuData> rank;
-		Ref<MenuDataEntry> permission;
-		Vector<String> messages;
-
-		int rank_id = 0;
-		int permission_id = 0;
-	};
-
-	void admin_permission_editor(Request *request);
-	void admin_render_permission_editor_main_view(Request *request, RBACAdminEditPermissionView *data);
-	void admin_render_permission_editor_entry_edit_create_view(Request *request, RBACAdminEditPermissionView *data);
-	bool admin_process_permission_editor_entry_edit_create_post(Request *request, RBACAdminEditPermissionView *data);
-
-	void admin_render_rank_editor(Request *request);
-
 	void initialize();
 
 	Ref<MenuData> get_data();
