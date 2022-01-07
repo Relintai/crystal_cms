@@ -23,7 +23,6 @@
 #include "backends/hash_hashlib/setup.h"
 
 #include "app/ccms_user_controller.h"
-#include "modules/rbac_users/rbac_user_model.h"
 #include "modules/users/user.h"
 
 #include "core/database/database_manager.h"
@@ -54,7 +53,6 @@ int main(int argc, char **argv, char **envp) {
 
 	// todo init these in the module automatically
 	UserController *user_controller = new CCMSUserController();
-	RBACUserModel *user_model = new RBACUserModel();
 	// user_manager->set_path("./users/");
 
 	DBSettings *settings = new DBSettings(true);
@@ -91,11 +89,11 @@ int main(int argc, char **argv, char **envp) {
 		settings->migrate();
 
 		session_manager->migrate();
-		user_model->migrate();
+		user_controller->migrate();
 
 		if (Platform::get_singleton()->arg_parser.has_arg("-u")) {
 			printf("Creating test users.\n");
-			user_model->create_test_users();
+			user_controller->create_test_users();
 		}
 
 		app->migrate();
@@ -106,7 +104,6 @@ int main(int argc, char **argv, char **envp) {
 	delete file_cache;
 	delete settings;
 	delete user_controller;
-	delete user_model;
 	delete session_manager;
 
 	PlatformInitializer::free_all();

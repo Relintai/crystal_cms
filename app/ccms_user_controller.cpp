@@ -6,7 +6,6 @@
 #include "core/http/http_session.h"
 #include "core/http/request.h"
 #include "core/http/session_manager.h"
-#include "modules/users/user_model.h"
 
 void CCMSUserController::render_login_request_default(Request *request, LoginRequestData *data) {
 	HTMLBuilder b;
