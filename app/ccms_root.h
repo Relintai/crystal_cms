@@ -27,30 +27,13 @@ class MenuNode;
 
 class CCMSRoot : public WebRoot {
 public:
-	enum MenuEntries {
-		MENUENTRY_NEWS = 0,
-		MENUENTRY_MAIL,
-		MENUENTRY_HERO,
-		MENUENTRY_VILLAGE,
-		MENUENTRY_SELECT_VILLAGE,
-		MENUENTRY_ALLIANCE,
-		MENUENTRY_ALLIANCE_MENU,
-		MENUENTRY_FORUM,
-		MENUENTRY_CHANGELOG,
-		MENUENTRY_SETTINGS,
-		MENUENTRY_LOGOUT,
-
-		MENUENTRY_MAX,
-	};
-
-public:
 	static bool is_logged_in(Request *request);
 
 	static void index(Object *instance, Request *request);
 
 	static void session_middleware_func(Object *instance, Request *request);
 
-	static void add_menu(Request *request, const MenuEntries index);
+	static void add_menu(Object *instance, Request *request);
 
 	static void village_page_func(Object *instance, Request *request);
 	static void admin_page_func(Object *instance, Request *request);

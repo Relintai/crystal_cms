@@ -38,29 +38,10 @@ bool CCMSRoot::is_logged_in(Request *request) {
 }
 
 void CCMSRoot::index(Object *instance, Request *request) {
-	ENSURE_LOGIN(request);
+	//ENSURE_LOGIN(request);
 
-	add_menu(request, MENUENTRY_NEWS);
+	add_menu(instance, request);
 
-	/*
-	<?php if (isset($hero)): ?>
-	<link rel="stylesheet" type="text/css" href="<?=base_url('css/hero.css'); ?>">
-	<?php endif; ?>
-
-	<?php if ($userlevel > 2): ?>
-		<link rel="stylesheet" type="text/css" href="<?=base_url('css/admin.css'); ?>">
-	<?php endif; ?>
-
-	<?php if ($page == 'mail'): ?>
-		<link rel="stylesheet" type="text/css" href="<?=base_url('css/mail.css'); ?>">
-	<?php endif; ?>
-
-	<?php if ($resources): ?>
-		<script src="<?=base_url('js/resource.js'); ?>"></script>
-	<?php endif; ?>
-	*/
-
-	// dynamic_cast<ListPage *>(instance)->index(request);
 	request->body += "test";
 	request->compile_and_send_body();
 }
@@ -68,141 +49,13 @@ void CCMSRoot::index(Object *instance, Request *request) {
 void CCMSRoot::session_middleware_func(Object *instance, Request *request) {
 }
 
-void CCMSRoot::add_menu(Request *request, const MenuEntries index) {
+void CCMSRoot::add_menu(Object *instance, Request *request) {
 	request->head += menu_head;
+
+	Object::cast_to<CCMSRoot>(instance)->_menu->render(request);
 
 	HTMLBuilder b;
 
-	HTMLTag *t;
-
-	/*
-	<?php if ($weather): ?>
-	<div class="menu_base <?=$weather['css']; ?>">
-	<?php else: ?>
-	<div class="menu_base">
-	<?php endif; ?>
-*/
-
-	b.div()->cls("menu_base");
-	{
-		b.div()->cls("left");
-		{
-			b.div()->cls("menu_news");
-			{
-				b.a()->href("/news/index");
-				b.w("News");
-				b.ca();
-			}
-			b.cdiv();
-
-			b.div()->cls("menu_mail");
-			{
-				b.a()->href("/mail/inbox");
-				b.w("Mails");
-				// if ($newmail) echo '!';
-				b.ca();
-			}
-			b.cdiv();
-
-			b.div()->cls("menu_hero");
-			{
-				b.a()->href("/hero/selected");
-				b.w("Hero");
-				b.ca();
-			}
-			b.cdiv();
-
-			b.div()->cls("menu_village");
-			{
-				b.a()->href("/village/selected");
-				b.w("Village"); // villagename
-				b.ca();
-			}
-			b.cdiv();
-
-			b.div()->cls("menu_sel_village");
-			{
-				b.a()->href("/village/select");
-				b.w("v");
-				b.ca();
-			}
-			b.cdiv();
-
-			/*
-			<?php if ($alliancename): ?>
-			<div class="menu_alliance">
-			<a href="<?=site_url($menu_alliance); ?>">[<?=$alliancename; ?>]</a>
-			</div>
-			<?php endif; ?>
-			*/
-
-			/*
-			<?php if ($weather): ?>
-			<div class="weather">
-			<abbr title="<?=$weather['description']; ?>"><?=$weather['name']; ?></abbr>
-			</div>
-			<?php endif; ?>
-			*/
-		}
-		b.cdiv();
-
-		b.div()->cls("right");
-		{
-			/*
-			<?php if ($userlevel > 4): ?>
-			<div class="menu_gm">
-			<a href="<?=site_url($link_gm); ?>">GM</a>
-			</div>
-			<?php endif; ?>
-			*/
-
-			/*
-			<?php if ($userlevel > 5): //dev+?>
-			<div class="menu_admin">
-			<a href="<?=site_url($link_admin); ?>">Admin</a>
-			</div>
-			<?php endif; ?>
-			*/
-
-			b.div()->cls("menu_alliance_menu");
-			{
-				b.a()->href("/alliance/alliance_menu");
-				b.w("Alliances");
-				b.ca();
-			}
-			b.cdiv();
-
-			b.div()->cls("menu_forum");
-			{
-				b.a()->href("/forum/index");
-				b.w("Forum");
-				b.ca();
-			}
-			b.cdiv();
-
-			b.div()->cls("menu_settings");
-			{
-				b.a()->href("/user/settings");
-				b.w("Settings");
-				b.ca();
-			}
-			b.cdiv();
-
-			b.div()->cls("menu_logout");
-			{
-				b.a()->href("/user/logout");
-				b.w("Logout");
-				b.ca();
-			}
-			b.cdiv();
-		}
-		b.cdiv();
-
-		b.div()->cls("nofloat");
-		b.cdiv();
-	}
-
-	b.cdiv();
 	b.div()->cls("main");
 	b.write_tag();
 
@@ -212,7 +65,7 @@ void CCMSRoot::add_menu(Request *request, const MenuEntries index) {
 }
 
 void CCMSRoot::village_page_func(Object *instance, Request *request) {
-	add_menu(request, MENUENTRY_VILLAGE);
+	add_menu(instance, request);
 
 	// dynamic_cast<ListPage *>(instance)->index(request);
 	request->body += "test";
@@ -225,7 +78,7 @@ void CCMSRoot::admin_page_func(Object *instance, Request *request) {
 
 void CCMSRoot::user_page_func(Object *instance, Request *request) {
 	if (is_logged_in(request)) {
-		add_menu(request, MENUENTRY_SETTINGS);
+		add_menu(instance, request);
 	}
 
 	UserController::get_singleton()->handle_request_default(request);
@@ -234,9 +87,9 @@ void CCMSRoot::user_page_func(Object *instance, Request *request) {
 void CCMSRoot::setup_routes() {
 	WebRoot::setup_routes();
 
-	index_func = HandlerInstance(index);
-	main_route_map["admin"] = HandlerInstance(admin_page_func);
-	main_route_map["user"] = HandlerInstance(user_page_func);
+	index_func = HandlerInstance(index, this);
+	main_route_map["admin"] = HandlerInstance(admin_page_func, this);
+	main_route_map["user"] = HandlerInstance(user_page_func, this);
 }
 
 void CCMSRoot::setup_middleware() {
@@ -264,10 +117,8 @@ void CCMSRoot::compile_menu() {
 	HTMLBuilder bh;
 
 	bh.meta()->charset_utf_8();
-	bh.meta()->name("description")->content("RPG browsergame");
-	bh.meta()->name("keywords")->content("RPG,browsergame,Mourne,game,play");
 	bh.title();
-	bh.w("Mourne");
+	bh.w("Crystal CMS");
 	bh.ctitle();
 
 	bh.link()->rel_stylesheet()->href("/css/base.css");
