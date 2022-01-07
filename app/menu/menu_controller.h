@@ -9,7 +9,6 @@
 #include "menu_data.h"
 #include "menu_data_entry.h"
 
-
 class Request;
 class FormValidator;
 
@@ -49,9 +48,9 @@ public:
 	};
 
 	void admin_permission_editor(Request *request);
-	void admin_render_permission_editor_main_view(Request *request, RBACAdminEditPermissionView* data);
-	void admin_render_permission_editor_entry_edit_create_view(Request *request, RBACAdminEditPermissionView* data);
-	bool admin_process_permission_editor_entry_edit_create_post(Request *request, RBACAdminEditPermissionView* data);
+	void admin_render_permission_editor_main_view(Request *request, RBACAdminEditPermissionView *data);
+	void admin_render_permission_editor_entry_edit_create_view(Request *request, RBACAdminEditPermissionView *data);
+	bool admin_process_permission_editor_entry_edit_create_post(Request *request, RBACAdminEditPermissionView *data);
 
 	void admin_render_rank_list(Request *request);
 	void admin_render_rank_editor(Request *request);
@@ -64,13 +63,23 @@ public:
 
 	bool continue_on_missing_default_rank();
 
-	static MenuController *get_singleton();
+	//db
+
+	virtual Ref<MenuData> db_load();
+
+	virtual void db_save(const Ref<MenuData> &menu);
+	virtual void db_save_menu_entry(const Ref<MenuDataEntry> &entry);
+
+	void create_table();
+	void drop_table();
+	void migrate();
+	void create_default_entries();
 
 	MenuController();
 	~MenuController();
 
 protected:
-	static MenuController *_self;
+	String _table;
 
 	Ref<MenuData> _data;
 };

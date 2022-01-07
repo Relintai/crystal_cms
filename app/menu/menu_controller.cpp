@@ -9,7 +9,11 @@
 #include "core/http/request.h"
 #include "core/http/session_manager.h"
 
-#include "menu_model.h"
+#include "core/database/database.h"
+#include "core/database/database_manager.h"
+#include "core/database/query_builder.h"
+#include "core/database/query_result.h"
+#include "core/database/table_builder.h"
 
 void MenuController::handle_request_main(Request *request) {
 }
@@ -40,26 +44,26 @@ void MenuController::admin_handle_request_main(Request *request) {
 
 void MenuController::admin_handle_new_rank(Request *request) {
 
-/*
-	if (request->get_method() == HTTP_METHOD_POST) {
-		Ref<RBACRank> rank;
-		rank.instance();
+	/*
+		if (request->get_method() == HTTP_METHOD_POST) {
+			Ref<RBACRank> rank;
+			rank.instance();
 
-		rank->name = request->get_parameter("name");
-		rank->name_internal = request->get_parameter("name_internal");
-		rank->settings = request->get_parameter("settings");
+			rank->name = request->get_parameter("name");
+			rank->name_internal = request->get_parameter("name_internal");
+			rank->settings = request->get_parameter("settings");
 
-		RBACModel::get_singleton()->save_rank(rank);
+			RBACModel::get_singleton()->save_rank(rank);
 
-		_ranks[rank->id] = rank;
+			_ranks[rank->id] = rank;
 
-		request->send_redirect(request->get_url_root_parent() + "edit_rank/" + String::num(rank->id));
-		return;
-	}
+			request->send_redirect(request->get_url_root_parent() + "edit_rank/" + String::num(rank->id));
+			return;
+		}
 
-	RBACAdminRankViewData data;
-	render_rank_view(request, &data);
-	*/
+		RBACAdminRankViewData data;
+		render_rank_view(request, &data);
+		*/
 }
 
 void MenuController::admin_handle_edit_rank(Request *request) {
@@ -149,84 +153,84 @@ void MenuController::render_rank_view(Request *request, RBACAdminRankViewData *d
 }
 
 void MenuController::admin_permission_editor(Request *request) {
-/*
-	String seg = request->get_current_path_segment();
+	/*
+		String seg = request->get_current_path_segment();
 
-	//check whether it's numeric
-	//if (!seg.is)
+		//check whether it's numeric
+		//if (!seg.is)
 
-	int id = seg.to_int();
+		int id = seg.to_int();
 
-	if (id == 0) {
-		RLOG_MSG("MenuController::admin_permission_editor: id == 0!\n");
-		request->send_redirect(request->get_url_root_parent());
-		return;
-	}
-
-	Ref<RBACRank> rank = _ranks[id];
-
-	if (!rank.is_valid()) {
-		RLOG_MSG("MenuController::admin_permission_editor: !rank.is_valid()\n");
-		request->send_redirect(request->get_url_root_parent());
-		return;
-	}
-
-	RBACAdminEditPermissionView data;
-	data.rank = rank;
-
-	request->push_path();
-
-	String segn = request->get_current_path_segment();
-
-	if (segn == "") {
-		admin_render_permission_editor_main_view(request, &data);
-		return;
-	}
-
-	if (segn == "new") {
-		request->push_path();
-
-		if (request->get_method() == HTTP_METHOD_POST) {
-			if (admin_process_permission_editor_entry_edit_create_post(request, &data)) {
-				return;
-			}
-		}
-
-		admin_render_permission_editor_entry_edit_create_view(request, &data);
-		return;
-	}
-
-	if (segn.is_uint()) {
-		int perm_index = segn.to_int();
-
-		request->push_path();
-
-		if (perm_index < 0 || perm_index >= rank->permissions.size()) {
-			RLOG_ERR("(perm_index < 0 || perm_index >= rank->permissions.size())!\n");
+		if (id == 0) {
+			RLOG_MSG("MenuController::admin_permission_editor: id == 0!\n");
 			request->send_redirect(request->get_url_root_parent());
 			return;
 		}
 
-		data.permission = rank->permissions[perm_index];
+		Ref<RBACRank> rank = _ranks[id];
 
-		if (!data.permission.is_valid()) {
-			RLOG_ERR("(!data.permission.is_valid()\n");
-			request->send_error(503);
+		if (!rank.is_valid()) {
+			RLOG_MSG("MenuController::admin_permission_editor: !rank.is_valid()\n");
+			request->send_redirect(request->get_url_root_parent());
 			return;
 		}
 
-		if (request->get_method() == HTTP_METHOD_POST) {
-			if (admin_process_permission_editor_entry_edit_create_post(request, &data)) {
-				return;
-			}
+		RBACAdminEditPermissionView data;
+		data.rank = rank;
+
+		request->push_path();
+
+		String segn = request->get_current_path_segment();
+
+		if (segn == "") {
+			admin_render_permission_editor_main_view(request, &data);
+			return;
 		}
 
-		admin_render_permission_editor_entry_edit_create_view(request, &data);
-		return;
-	}
+		if (segn == "new") {
+			request->push_path();
 
-	request->send_error(404);
-	*/
+			if (request->get_method() == HTTP_METHOD_POST) {
+				if (admin_process_permission_editor_entry_edit_create_post(request, &data)) {
+					return;
+				}
+			}
+
+			admin_render_permission_editor_entry_edit_create_view(request, &data);
+			return;
+		}
+
+		if (segn.is_uint()) {
+			int perm_index = segn.to_int();
+
+			request->push_path();
+
+			if (perm_index < 0 || perm_index >= rank->permissions.size()) {
+				RLOG_ERR("(perm_index < 0 || perm_index >= rank->permissions.size())!\n");
+				request->send_redirect(request->get_url_root_parent());
+				return;
+			}
+
+			data.permission = rank->permissions[perm_index];
+
+			if (!data.permission.is_valid()) {
+				RLOG_ERR("(!data.permission.is_valid()\n");
+				request->send_error(503);
+				return;
+			}
+
+			if (request->get_method() == HTTP_METHOD_POST) {
+				if (admin_process_permission_editor_entry_edit_create_post(request, &data)) {
+					return;
+				}
+			}
+
+			admin_render_permission_editor_entry_edit_create_view(request, &data);
+			return;
+		}
+
+		request->send_error(404);
+		*/
 }
 
 void MenuController::admin_render_permission_editor_main_view(Request *request, RBACAdminEditPermissionView *data) {
@@ -414,7 +418,7 @@ void MenuController::admin_add_section_links(Vector<AdminSectionLinkInfo> *links
 }
 
 void MenuController::initialize() {
-	_data = MenuModel::get_singleton()->load();
+	_data = db_load();
 }
 
 Ref<MenuData> MenuController::get_data() {
@@ -422,28 +426,107 @@ Ref<MenuData> MenuController::get_data() {
 }
 
 bool MenuController::continue_on_missing_default_rank() {
-	//todo, add setting
+	// todo, add setting
 	return false;
 }
 
-MenuController *MenuController::get_singleton() {
-	return _self;
+// DB
+
+Ref<MenuData> MenuController::db_load() {
+	Ref<MenuData> data;
+	data.instance();
+
+	Ref<QueryBuilder> qb = get_query_builder();
+
+	qb->select("id,name,url,sort_order")->from(_table);
+	Ref<QueryResult> res = qb->run();
+
+	while (res->next_row()) {
+		Ref<MenuDataEntry> e;
+		e.instance();
+
+		e->id = res->get_cell_int(0);
+		e->name = res->get_cell_str(1);
+		e->url = res->get_cell_str(2);
+		e->sort_order = res->get_cell_int(3);
+
+		data->entries.push_back(e);
+	}
+
+	data->sort_entries();
+
+	return data;
+}
+
+void MenuController::db_save(const Ref<MenuData> &menu) {
+	for (int i = 0; i < menu->entries.size(); ++i) {
+		Ref<MenuDataEntry> entry = menu->entries[i];
+
+		db_save_menu_entry(entry);
+	}
+}
+
+void MenuController::db_save_menu_entry(const Ref<MenuDataEntry> &entry) {
+	Ref<QueryBuilder> qb = get_query_builder();
+
+	if (entry->id == 0) {
+		qb->insert(_table, "name,url,sort_order")->values();
+		qb->val(entry->name)->val(entry->url);
+		qb->val(entry->sort_order);
+		qb->cvalues();
+		qb->select_last_insert_id();
+		Ref<QueryResult> res = qb->run();
+		// qb->print();
+
+		Ref<MenuDataEntry> e = entry;
+
+		e->id = res->get_last_insert_rowid();
+	} else {
+		qb->update(_table)->set();
+		qb->setp("name", entry->name);
+		qb->setp("url", entry->url);
+		qb->setp("sort_order", entry->sort_order);
+		qb->cset();
+		qb->where()->wp("id", entry->id);
+		qb->end_command();
+		qb->run_query();
+		// qb->print();
+	}
+}
+
+void MenuController::create_table() {
+	Ref<TableBuilder> tb = get_table_builder();
+
+	tb->create_table(_table);
+	tb->integer("id")->auto_increment()->next_row();
+	tb->varchar("name", 60)->not_null()->next_row();
+	tb->varchar("url", 500)->not_null()->next_row();
+	tb->integer("sort_order")->not_null()->next_row();
+	tb->primary_key("id");
+	tb->ccreate_table();
+	tb->run_query();
+	// tb->print();
+}
+void MenuController::drop_table() {
+	Ref<TableBuilder> tb = get_table_builder();
+
+	tb->drop_table_if_exists(_table)->run_query();
+	// tb->print();
+}
+void MenuController::migrate() {
+	drop_table();
+	create_table();
+	create_default_entries();
+}
+
+void MenuController::create_default_entries() {
 }
 
 MenuController::MenuController() :
 		AdminNode() {
 
-	if (_self) {
-		printf("MenuController::MenuController(): Error! self is not null!/n");
-	}
-
-	_self = this;
+	_table = "menu";
 }
 
 MenuController::~MenuController() {
-	if (_self == this) {
-		_self = nullptr;
-	}
 }
-
-MenuController *MenuController::_self = nullptr;
