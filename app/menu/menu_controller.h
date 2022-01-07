@@ -1,7 +1,7 @@
 #ifndef MENU_CONTROLLER_H
 #define MENU_CONTROLLER_H
 
-#include "modules/admin_panel/admin_controller.h"
+#include "modules/admin_panel/admin_node.h"
 
 #include "core/containers/vector.h"
 #include "core/string.h"
@@ -13,8 +13,8 @@
 class Request;
 class FormValidator;
 
-class MenuController : public AdminController {
-	RCPP_OBJECT(MenuController, AdminController);
+class MenuController : public AdminNode {
+	RCPP_OBJECT(MenuController, AdminNode);
 
 public:
 	void handle_request_main(Request *request);

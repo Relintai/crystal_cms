@@ -431,7 +431,7 @@ MenuController *MenuController::get_singleton() {
 }
 
 MenuController::MenuController() :
-		AdminController() {
+		AdminNode() {
 
 	if (_self) {
 		printf("MenuController::MenuController(): Error! self is not null!/n");

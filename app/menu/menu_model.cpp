@@ -105,7 +105,7 @@ MenuModel *MenuModel::get_singleton() {
 }
 
 MenuModel::MenuModel() :
-		Model() {
+		WebNode() {
 
 	if (_self) {
 		printf("MenuModel::MenuModel(): Error! self is not null!/n");

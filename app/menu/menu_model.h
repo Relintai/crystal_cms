@@ -1,7 +1,7 @@
 #ifndef MENU_MODEL_H
 #define MENU_MODEL_H
 
-#include "core/http/model.h"
+#include "core/http/web_node.h"
 
 #include "core/containers/vector.h"
 #include "core/string.h"
@@ -9,8 +9,8 @@
 #include "menu_data.h"
 #include "menu_data_entry.h"
 
-class MenuModel : public Model {
-	RCPP_OBJECT(MenuModel, Model);
+class MenuModel : public WebNode {
+	RCPP_OBJECT(MenuModel, WebNode);
 
 public:
 	virtual Ref<MenuData> load();
