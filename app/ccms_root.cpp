@@ -279,6 +279,9 @@ CCMSRoot::CCMSRoot() :
 
 	_admin_panel = new AdminPanel();
 	_admin_panel->register_admin_controller("rbac", _rbac_controller);
+	_admin_panel->add_child(_rbac_controller);
+
+	add_child(_admin_panel);
 	
 	compile_menu();
 }
