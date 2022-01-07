@@ -2,9 +2,8 @@
 #include <iostream>
 #include <string>
 
-#include "core/bry_http/http_server.h"
 #include "core/file_cache.h"
-#include "core/http/web_application.h"
+#include "core/http/web_root.h"
 
 #include "app/ccms_application.h"
 
@@ -14,8 +13,6 @@
 #include "core/settings/db_settings.h"
 
 #include "core/http/session_manager.h"
-
-#define MAIN_CLASS CCMSApplication
 
 #include "modules/drogon/web_application.h"
 
@@ -66,11 +63,14 @@ int main(int argc, char **argv, char **envp) {
 
 	create_databases();
 
-	DWebApplication *app = new MAIN_CLASS();
+	DWebApplication *app = new DWebApplication();
+	CCMSApplication *app_root = new CCMSApplication();
 
-	app->load_settings();
-	app->setup_routes();
-	app->setup_middleware();
+	app->set_root(app_root);
+
+	app_root->load_settings();
+	app_root->setup_routes();
+	app_root->setup_middleware();
 
 	app->add_listener("127.0.0.1", 8080);
 	LOG_INFO << "Server running on 127.0.0.1:8080";
@@ -96,10 +96,11 @@ int main(int argc, char **argv, char **envp) {
 			user_controller->create_test_users();
 		}
 
-		app->migrate();
+		app_root->migrate();
 	}
 
 	delete app;
+	delete app_root;
 	delete dbm;
 	delete file_cache;
 	delete settings;

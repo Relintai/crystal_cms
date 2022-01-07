@@ -226,7 +226,7 @@ void CCMSApplication::user_page_func(Object *instance, Request *request) {
 }
 
 void CCMSApplication::setup_routes() {
-	DWebApplication::setup_routes();
+	WebRoot::setup_routes();
 
 	index_func = HandlerInstance(index);
 	main_route_map["admin"] = HandlerInstance(admin_page_func);
@@ -239,7 +239,7 @@ void CCMSApplication::setup_middleware() {
 	//middlewares.push_back(HandlerInstance(::RBACUserController::rbac_user_session_setup_middleware));
 	middlewares.push_back(HandlerInstance(::RBACUserController::rbac_default_user_session_middleware));
 
-	DWebApplication::setup_middleware();
+	WebRoot::setup_middleware();
 }
 
 void CCMSApplication::migrate() {
@@ -272,7 +272,7 @@ void CCMSApplication::compile_menu() {
 }
 
 CCMSApplication::CCMSApplication() :
-		DWebApplication() {
+		WebRoot() {
 
 	_rbac_controller = new RBACController();
 	_rbac_controller->initialize();

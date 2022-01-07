@@ -3,7 +3,7 @@
 
 //#include "core/http/web_application.h"
 #include "core/object.h"
-#include "modules/drogon/web_application.h"
+#include "core/http/web_root.h"
 
 #undef LOG_TRACE
 #undef LOG_WARN
@@ -23,7 +23,7 @@ class RBACModel;
 		return;                                \
 	}
 
-class CCMSApplication : public DWebApplication {
+class CCMSApplication : public WebRoot {
 public:
 	enum MenuEntries {
 		MENUENTRY_NEWS = 0,
