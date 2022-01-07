@@ -1,5 +1,5 @@
-#ifndef MENU_CONTROLLER_H
-#define MENU_CONTROLLER_H
+#ifndef MENU_NODE_H
+#define MENU_NODE_H
 
 #include "modules/admin_panel/admin_node.h"
 
@@ -12,8 +12,8 @@
 class Request;
 class FormValidator;
 
-class MenuController : public AdminNode {
-	RCPP_OBJECT(MenuController, AdminNode);
+class MenuNode : public AdminNode {
+	RCPP_OBJECT(MenuNode, AdminNode);
 
 public:
 	void handle_request_main(Request *request);
@@ -75,8 +75,8 @@ public:
 	void migrate();
 	void create_default_entries();
 
-	MenuController();
-	~MenuController();
+	MenuNode();
+	~MenuNode();
 
 protected:
 	String _table;
