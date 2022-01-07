@@ -14,7 +14,7 @@
 
 #include "core/http/session_manager.h"
 
-#include "modules/drogon/web_application.h"
+#include "modules/drogon/drogon_web_server.h"
 
 // Backends
 #include "backends/hash_hashlib/setup.h"
@@ -63,7 +63,7 @@ int main(int argc, char **argv, char **envp) {
 
 	create_databases();
 
-	DWebApplication *app = new DWebApplication();
+	DrogonWebServer *app = new DrogonWebServer();
 	CCMSApplication *app_root = new CCMSApplication();
 
 	app->set_root(app_root);
