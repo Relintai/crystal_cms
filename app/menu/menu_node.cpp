@@ -303,7 +303,6 @@ void MenuNode::admin_handle_delete(Request *request) {
 				if (be->sort_order > sort_order) {
 					be->sort_order -= 1;
 					db_save_menu_entry(be);
-					break;
 				}
 			}
 
