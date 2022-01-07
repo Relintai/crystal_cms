@@ -35,6 +35,10 @@ public:
 	void admin_handle_edit_menuentry(Request *request);
 	void render_menuentry_view(Request *request, MenudminEntryViewData *data);
 
+	void admin_handle_up(Request *request);
+	void admin_handle_down(Request *request);
+	void admin_handle_delete(Request *request);
+
 	void initialize();
 
 	Ref<MenuData> get_data();
