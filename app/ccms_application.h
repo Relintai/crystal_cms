@@ -66,7 +66,6 @@ public:
 
 	AdminPanel *_admin_panel; 
 	RBACController *_rbac_controller;
-	RBACModel *_rbac_model;
 
 	static std::string menu_head;
 	static std::string footer;

@@ -20,7 +20,6 @@
 
 #include "modules/admin_panel/admin_panel.h"
 #include "modules/rbac/rbac_controller.h"
-#include "modules/rbac/rbac_model.h"
 
 bool CCMSApplication::is_logged_in(Request *request) {
 	if (!request->session) {
@@ -244,7 +243,7 @@ void CCMSApplication::setup_middleware() {
 }
 
 void CCMSApplication::migrate() {
-	_rbac_model->migrate();
+	_rbac_controller->migrate();
 }
 
 void CCMSApplication::compile_menu() {
@@ -275,7 +274,6 @@ void CCMSApplication::compile_menu() {
 CCMSApplication::CCMSApplication() :
 		DWebApplication() {
 
-	_rbac_model = new RBACModel();
 	_rbac_controller = new RBACController();
 	_rbac_controller->initialize();
 
@@ -288,7 +286,6 @@ CCMSApplication::CCMSApplication() :
 CCMSApplication::~CCMSApplication() {
 	delete _admin_panel;
 	delete _rbac_controller;
-	delete _rbac_model;
 }
 
 std::string CCMSApplication::menu_head = "";
