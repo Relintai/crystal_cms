@@ -19,9 +19,6 @@
 // Backends
 #include "backends/hash_hashlib/setup.h"
 
-#include "app/ccms_user_controller.h"
-#include "modules/users/user.h"
-
 #include "core/database/database_manager.h"
 #include "platform/platform_initializer.h"
 
@@ -47,10 +44,6 @@ int main(int argc, char **argv, char **envp) {
 	initialize_backends();
 
 	::SessionManager *session_manager = new ::SessionManager();
-
-	// todo init these in the module automatically
-	UserController *user_controller = new CCMSUserController();
-	// user_manager->set_path("./users/");
 
 	DBSettings *settings = new DBSettings(true);
 	// settings->parse_file("settings.json");
@@ -87,15 +80,7 @@ int main(int argc, char **argv, char **envp) {
 		printf("Running migrations.\n");
 
 		settings->migrate();
-
 		session_manager->migrate();
-		user_controller->migrate();
-
-		if (Platform::get_singleton()->arg_parser.has_arg("-u")) {
-			printf("Creating test users.\n");
-			user_controller->create_test_users();
-		}
-
 		app_root->migrate();
 	}
 
@@ -104,7 +89,6 @@ int main(int argc, char **argv, char **envp) {
 	delete dbm;
 	delete file_cache;
 	delete settings;
-	delete user_controller;
 	delete session_manager;
 
 	PlatformInitializer::free_all();

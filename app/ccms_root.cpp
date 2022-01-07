@@ -21,6 +21,10 @@
 #include "modules/admin_panel/admin_panel.h"
 #include "modules/rbac/rbac_controller.h"
 
+#include "ccms_user_controller.h"
+
+#include "core/os/platform.h"
+
 bool CCMSRoot::is_logged_in(Request *request) {
 	if (!request->session) {
 		return false;
@@ -54,7 +58,7 @@ void CCMSRoot::index(Object *instance, Request *request) {
 	<?php endif; ?>
 	*/
 
-	//dynamic_cast<ListPage *>(instance)->index(request);
+	// dynamic_cast<ListPage *>(instance)->index(request);
 	request->body += "test";
 	request->compile_and_send_body();
 }
@@ -93,7 +97,7 @@ void CCMSRoot::add_menu(Request *request, const MenuEntries index) {
 			{
 				b.a()->href("/mail/inbox");
 				b.w("Mails");
-				//if ($newmail) echo '!';
+				// if ($newmail) echo '!';
 				b.ca();
 			}
 			b.cdiv();
@@ -109,7 +113,7 @@ void CCMSRoot::add_menu(Request *request, const MenuEntries index) {
 			b.div()->cls("menu_village");
 			{
 				b.a()->href("/village/selected");
-				b.w("Village"); //villagename
+				b.w("Village"); // villagename
 				b.ca();
 			}
 			b.cdiv();
@@ -208,7 +212,7 @@ void CCMSRoot::add_menu(Request *request, const MenuEntries index) {
 void CCMSRoot::village_page_func(Object *instance, Request *request) {
 	add_menu(request, MENUENTRY_VILLAGE);
 
-	//dynamic_cast<ListPage *>(instance)->index(request);
+	// dynamic_cast<ListPage *>(instance)->index(request);
 	request->body += "test";
 	request->compile_and_send_body();
 }
@@ -235,8 +239,8 @@ void CCMSRoot::setup_routes() {
 
 void CCMSRoot::setup_middleware() {
 	middlewares.push_back(HandlerInstance(::SessionManager::session_setup_middleware));
-	//middlewares.push_back(HandlerInstance(::UserController::user_session_setup_middleware));
-	//middlewares.push_back(HandlerInstance(::RBACUserController::rbac_user_session_setup_middleware));
+	// middlewares.push_back(HandlerInstance(::UserController::user_session_setup_middleware));
+	// middlewares.push_back(HandlerInstance(::RBACUserController::rbac_user_session_setup_middleware));
 	middlewares.push_back(HandlerInstance(::RBACUserController::rbac_default_user_session_middleware));
 
 	WebRoot::setup_middleware();
@@ -244,6 +248,12 @@ void CCMSRoot::setup_middleware() {
 
 void CCMSRoot::migrate() {
 	_rbac_controller->migrate();
+	_user_controller->migrate();
+
+	if (Platform::get_singleton()->arg_parser.has_arg("-u")) {
+		printf("Creating test users.\n");
+		_user_controller->create_test_users();
+	}
 }
 
 void CCMSRoot::compile_menu() {
@@ -274,6 +284,10 @@ void CCMSRoot::compile_menu() {
 CCMSRoot::CCMSRoot() :
 		WebRoot() {
 
+	_user_controller = new CCMSUserController();
+	// user_manager->set_path("./users/");
+	add_child(_user_controller);
+
 	_rbac_controller = new RBACController();
 	_rbac_controller->initialize();
 
@@ -282,13 +296,14 @@ CCMSRoot::CCMSRoot() :
 	_admin_panel->add_child(_rbac_controller);
 
 	add_child(_admin_panel);
-	
+
 	compile_menu();
 }
 
 CCMSRoot::~CCMSRoot() {
 	delete _admin_panel;
 	delete _rbac_controller;
+	delete _user_controller;
 }
 
 std::string CCMSRoot::menu_head = "";
