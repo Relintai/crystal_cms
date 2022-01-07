@@ -16,19 +16,29 @@
 #include "core/database/table_builder.h"
 
 void MenuNode::render(Request *request) {
-	/*
-	<div class="menu">
-		<ul class="menu">
-			@if (count($menu) > 0)
-			@foreach ($menu as $e)
-			<li class="menuentry">
-				{!! link_to($e->url, trans('menu.' . $e->name_key)) !!}
-			</li>
-			@endforeach
-			@endif
-		</ul>
-	</div>
-	*/
+	HTMLBuilder b;
+
+	b.div("menu");
+	{
+		b.ul()->cls("menu");
+		{
+			// read lock _data
+			for (int i = 0; i < _data->entries.size(); ++i) {
+				Ref<MenuDataEntry> e = _data->entries[i];
+
+				b.li();
+				{
+					b.a("/" + e->url)->f()->w(e->url)->ca();
+				}
+				b.cli();
+			}
+			// read unlock _data
+		}
+		b.cul();
+	}
+	b.cdiv();
+
+	request->body += b.result;
 }
 
 void MenuNode::create_validators() {
@@ -166,7 +176,7 @@ void MenuNode::render_menuentry_view(Request *request, MenudminEntryViewData *da
 			b.w("Create Page?");
 			b.input_checkbox("create_page", "create_page")->checked()->f()->br();
 		}
-		
+
 		b.br();
 		b.input()->type("submit")->value("Save");
 	}
