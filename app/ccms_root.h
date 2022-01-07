@@ -1,5 +1,5 @@
-#ifndef CCMS_APPLICATION_H
-#define CCMS_APPLICATION_H
+#ifndef CCMS_ROOT_H
+#define CCMS_ROOT_H
 
 //#include "core/http/web_application.h"
 #include "core/object.h"
@@ -23,7 +23,7 @@ class RBACModel;
 		return;                                \
 	}
 
-class CCMSApplication : public WebRoot {
+class CCMSRoot : public WebRoot {
 public:
 	enum MenuEntries {
 		MENUENTRY_NEWS = 0,
@@ -61,8 +61,8 @@ public:
 
 	void compile_menu();
 
-	CCMSApplication();
-	~CCMSApplication();
+	CCMSRoot();
+	~CCMSRoot();
 
 	AdminPanel *_admin_panel; 
 	RBACController *_rbac_controller;

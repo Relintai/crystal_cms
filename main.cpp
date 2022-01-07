@@ -5,7 +5,7 @@
 #include "core/file_cache.h"
 #include "core/http/web_root.h"
 
-#include "app/ccms_application.h"
+#include "app/ccms_root.h"
 
 #include "database/db_init.h"
 
@@ -64,7 +64,7 @@ int main(int argc, char **argv, char **envp) {
 	create_databases();
 
 	DrogonWebServer *app = new DrogonWebServer();
-	CCMSApplication *app_root = new CCMSApplication();
+	CCMSRoot *app_root = new CCMSRoot();
 
 	app->set_root(app_root);
 

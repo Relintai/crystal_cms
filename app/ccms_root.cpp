@@ -1,4 +1,4 @@
-#include "ccms_application.h"
+#include "ccms_root.h"
 
 #include "core/http/request.h"
 
@@ -21,7 +21,7 @@
 #include "modules/admin_panel/admin_panel.h"
 #include "modules/rbac/rbac_controller.h"
 
-bool CCMSApplication::is_logged_in(Request *request) {
+bool CCMSRoot::is_logged_in(Request *request) {
 	if (!request->session) {
 		return false;
 	}
@@ -31,7 +31,7 @@ bool CCMSApplication::is_logged_in(Request *request) {
 	return u.is_valid();
 }
 
-void CCMSApplication::index(Object *instance, Request *request) {
+void CCMSRoot::index(Object *instance, Request *request) {
 	ENSURE_LOGIN(request);
 
 	add_menu(request, MENUENTRY_NEWS);
@@ -59,10 +59,10 @@ void CCMSApplication::index(Object *instance, Request *request) {
 	request->compile_and_send_body();
 }
 
-void CCMSApplication::session_middleware_func(Object *instance, Request *request) {
+void CCMSRoot::session_middleware_func(Object *instance, Request *request) {
 }
 
-void CCMSApplication::add_menu(Request *request, const MenuEntries index) {
+void CCMSRoot::add_menu(Request *request, const MenuEntries index) {
 	request->head += menu_head;
 
 	HTMLBuilder b;
@@ -205,7 +205,7 @@ void CCMSApplication::add_menu(Request *request, const MenuEntries index) {
 	request->footer = footer;
 }
 
-void CCMSApplication::village_page_func(Object *instance, Request *request) {
+void CCMSRoot::village_page_func(Object *instance, Request *request) {
 	add_menu(request, MENUENTRY_VILLAGE);
 
 	//dynamic_cast<ListPage *>(instance)->index(request);
@@ -213,11 +213,11 @@ void CCMSApplication::village_page_func(Object *instance, Request *request) {
 	request->compile_and_send_body();
 }
 
-void CCMSApplication::admin_page_func(Object *instance, Request *request) {
+void CCMSRoot::admin_page_func(Object *instance, Request *request) {
 	AdminPanel::get_singleton()->handle_request_main(request);
 }
 
-void CCMSApplication::user_page_func(Object *instance, Request *request) {
+void CCMSRoot::user_page_func(Object *instance, Request *request) {
 	if (is_logged_in(request)) {
 		add_menu(request, MENUENTRY_SETTINGS);
 	}
@@ -225,7 +225,7 @@ void CCMSApplication::user_page_func(Object *instance, Request *request) {
 	UserController::get_singleton()->handle_request_default(request);
 }
 
-void CCMSApplication::setup_routes() {
+void CCMSRoot::setup_routes() {
 	WebRoot::setup_routes();
 
 	index_func = HandlerInstance(index);
@@ -233,7 +233,7 @@ void CCMSApplication::setup_routes() {
 	main_route_map["user"] = HandlerInstance(user_page_func);
 }
 
-void CCMSApplication::setup_middleware() {
+void CCMSRoot::setup_middleware() {
 	middlewares.push_back(HandlerInstance(::SessionManager::session_setup_middleware));
 	//middlewares.push_back(HandlerInstance(::UserController::user_session_setup_middleware));
 	//middlewares.push_back(HandlerInstance(::RBACUserController::rbac_user_session_setup_middleware));
@@ -242,11 +242,11 @@ void CCMSApplication::setup_middleware() {
 	WebRoot::setup_middleware();
 }
 
-void CCMSApplication::migrate() {
+void CCMSRoot::migrate() {
 	_rbac_controller->migrate();
 }
 
-void CCMSApplication::compile_menu() {
+void CCMSRoot::compile_menu() {
 	HTMLBuilder bh;
 
 	bh.meta()->charset_utf_8();
@@ -271,7 +271,7 @@ void CCMSApplication::compile_menu() {
 	footer = bf.result;
 }
 
-CCMSApplication::CCMSApplication() :
+CCMSRoot::CCMSRoot() :
 		WebRoot() {
 
 	_rbac_controller = new RBACController();
@@ -283,10 +283,10 @@ CCMSApplication::CCMSApplication() :
 	compile_menu();
 }
 
-CCMSApplication::~CCMSApplication() {
+CCMSRoot::~CCMSRoot() {
 	delete _admin_panel;
 	delete _rbac_controller;
 }
 
-std::string CCMSApplication::menu_head = "";
-std::string CCMSApplication::footer = "";
+std::string CCMSRoot::menu_head = "";
+std::string CCMSRoot::footer = "";
