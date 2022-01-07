@@ -256,6 +256,8 @@ void CCMSRoot::migrate() {
 		printf("Creating test users.\n");
 		_user_controller->create_test_users();
 	}
+
+	_menu->migrate();
 }
 
 void CCMSRoot::compile_menu() {
