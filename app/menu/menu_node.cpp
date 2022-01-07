@@ -193,39 +193,44 @@ void MenuNode::admin_render_menuentry_list(Request *request) {
 			b.cli();
 
 			b.li();
-			/*
-										@if ($i != 0)
-											{!! Form::open(array('url' => 'admin/menu_editor/up')) !!}
-											{!! Form::hidden('id', $menuentries[$i]->id) !!}
-											{!! Form::submit(trans('admin.up')) !!}
-											{!! Form::close() !!}
-										@else
-											{{ trans('admin.up') }}
-										@endif
-			*/
+			{
+				if (i != 0) {
+					b.form()->method("POST")->action(request->get_url_root() + "up");
+					{
+						b.input_hidden("id", String::num(e->id));
+						b.input_submit("Up");
+					}
+					b.cform();
+				} else {
+					b.w("Up");
+				}
+			}
 			b.cli();
 
 			b.li();
-
-			/*
-										@if ($i + 1 != count($menuentries))
-											{!! Form::open(array('url' => 'admin/menu_editor/down')) !!}
-											{!! Form::hidden('id', $menuentries[$i]->id) !!}
-											{!! Form::submit(trans('admin.down')) !!}
-											{!! Form::close() !!}
-										@else
-											{{ trans('admin.down') }}
-										@endif
-										*/
+			{
+				if (i + 1 != _data->entries.size()) {
+					b.form()->method("POST")->action(request->get_url_root() + "down");
+					{
+						b.input_hidden("id", String::num(e->id));
+						b.input_submit("Down");
+					}
+					b.cform();
+				} else {
+					b.w("Down");
+				}
+			}
 			b.cli();
 
 			b.li();
-			/*
-										{!! Form::open(array('url' => 'admin/menu_editor/delete')) !!}
-										{!! Form::hidden('id', $menuentries[$i]->id) !!}
-										{!! Form::submit(trans('admin.delete')) !!}
-										{!! Form::close() !!}
-			*/
+			{
+				b.form()->method("POST")->action(request->get_url_root() + "delete");
+				{
+					b.input_hidden("id", String::num(e->id));
+					b.input_submit("Delete");
+				}
+				b.cform();
+			}
 			b.cli();
 		}
 		b.cul()->cdiv();
