@@ -154,10 +154,6 @@ CCMSRoot::CCMSRoot() :
 }
 
 CCMSRoot::~CCMSRoot() {
-	delete _admin_panel;
-	delete _rbac_controller;
-	delete _menu;
-	delete _user_controller;
 }
 
 std::string CCMSRoot::menu_head = "";
