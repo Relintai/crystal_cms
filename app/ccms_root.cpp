@@ -26,12 +26,11 @@
 #include "menu/menu_node.h"
 
 void CCMSRoot::handle_request_main(Request *request) {
-	// this is a hack, until I have a simple index node, or port contentcontroller.
-
 	if (try_send_wwwroot_file(request)) {
 		return;
 	}
 
+	// this is a hack, until I have a simple index node, or port contentcontroller.
 	if (request->get_path_segment_count() == 0) {
 		index(request);
 		return;
