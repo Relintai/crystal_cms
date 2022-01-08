@@ -58,7 +58,8 @@ int main(int argc, char **argv, char **envp) {
 
 	DrogonWebServer *app = new DrogonWebServer();
 	CCMSRoot *app_root = new CCMSRoot();
-
+	app_root->setup();
+	
 	app->set_root(app_root);
 
 	app->add_listener("127.0.0.1", 8080);

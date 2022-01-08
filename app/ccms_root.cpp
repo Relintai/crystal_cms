@@ -26,6 +26,8 @@
 #include "menu/menu_node.h"
 
 void CCMSRoot::handle_request_main(Request *request) {
+	process_middlewares(request);
+
 	if (try_send_wwwroot_file(request)) {
 		return;
 	}

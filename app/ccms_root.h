@@ -37,7 +37,7 @@ public:
 
 	void add_menu(Request *request);
 
-	virtual void setup_middleware();
+	void setup_middleware();
 	void migrate();
 
 	void compile_menu();
