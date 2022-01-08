@@ -37,9 +37,15 @@ void CCMSRoot::handle_request_main(Request *request) {
 		return;
 	}
 
-	if (!try_route_request_to_children(request)) {
+	WebNode *handler = get_request_handler_child(request);
+
+	if (!handler) {
 		request->send_error(404);
+		return;
 	}
+
+	add_menu(request);
+	handler->handle_request_main(request);
 }
 
 bool CCMSRoot::is_logged_in(Request *request) {
@@ -82,7 +88,7 @@ void CCMSRoot::setup_middleware() {
 	// _middlewares.push_back(Ref<RBACUserSessionSetupMiddleware>(new RBACUserSessionSetupMiddleware()));
 	_middlewares.push_back(Ref<RBACDefaultUserSessionSetupMiddleware>(new RBACDefaultUserSessionSetupMiddleware()));
 
-	//WebRoot::setup_middleware();
+	// WebRoot::setup_middleware();
 }
 
 void CCMSRoot::migrate() {
