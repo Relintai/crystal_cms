@@ -26,6 +26,8 @@ class MenuNode;
 	}
 
 class CCMSRoot : public WebRoot {
+	RCPP_OBJECT(CCMSRoot, WebRoot);
+	
 public:
 	static bool is_logged_in(Request *request);
 
