@@ -33,7 +33,7 @@ void CCMSRoot::handle_request_main(Request *request) {
 	}
 
 	if (request->get_path_segment_count() == 0) {
-		index(this, request);
+		index(request);
 		return;
 	}
 
@@ -52,22 +52,19 @@ bool CCMSRoot::is_logged_in(Request *request) {
 	return u.is_valid();
 }
 
-void CCMSRoot::index(Object *instance, Request *request) {
+void CCMSRoot::index(Request *request) {
 	// ENSURE_LOGIN(request);
 
-	add_menu(instance, request);
+	add_menu(request);
 
 	request->body += "test";
 	request->compile_and_send_body();
 }
 
-void CCMSRoot::session_middleware_func(Object *instance, Request *request) {
-}
-
-void CCMSRoot::add_menu(Object *instance, Request *request) {
+void CCMSRoot::add_menu(Request *request) {
 	request->head += menu_head;
 
-	Object::cast_to<CCMSRoot>(instance)->_menu->render(request);
+	_menu->render(request);
 
 	HTMLBuilder b;
 
@@ -77,26 +74,6 @@ void CCMSRoot::add_menu(Object *instance, Request *request) {
 	request->body += b.result;
 
 	request->footer = footer;
-}
-
-void CCMSRoot::village_page_func(Object *instance, Request *request) {
-	add_menu(instance, request);
-
-	// dynamic_cast<ListPage *>(instance)->index(request);
-	request->body += "test";
-	request->compile_and_send_body();
-}
-
-void CCMSRoot::admin_page_func(Object *instance, Request *request) {
-	AdminPanel::get_singleton()->handle_request_main(request);
-}
-
-void CCMSRoot::user_page_func(Object *instance, Request *request) {
-	if (is_logged_in(request)) {
-		add_menu(instance, request);
-	}
-
-	UserController::get_singleton()->handle_request_main(request);
 }
 
 void CCMSRoot::setup_middleware() {

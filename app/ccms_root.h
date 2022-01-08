@@ -31,21 +31,14 @@ class CCMSRoot : public WebRoot {
 public:
 	void handle_request_main(Request *request);
 
-	static bool is_logged_in(Request *request);
+	bool is_logged_in(Request *request);
 
-	static void index(Object *instance, Request *request);
+	void index(Request *request);
 
-	static void session_middleware_func(Object *instance, Request *request);
-
-	static void add_menu(Object *instance, Request *request);
-
-	static void village_page_func(Object *instance, Request *request);
-	static void admin_page_func(Object *instance, Request *request);
-	static void user_page_func(Object *instance, Request *request);
+	void add_menu(Request *request);
 
 	virtual void setup_middleware();
-
-	virtual void migrate();
+	void migrate();
 
 	void compile_menu();
 
