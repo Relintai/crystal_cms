@@ -6,8 +6,6 @@
 
 #include "core/file_cache.h"
 
-#include "core/http/handler_instance.h"
-
 #include "core/database/database_manager.h"
 
 #include "core/html/html_builder.h"
@@ -28,8 +26,8 @@
 #include "menu/menu_node.h"
 
 void CCMSRoot::handle_request_main(Request *request) {
-	//this is a hack, until I have a simple index node, or port contentcontroller.
-	
+	// this is a hack, until I have a simple index node, or port contentcontroller.
+
 	if (try_send_wwwroot_file(request)) {
 		return;
 	}
@@ -55,7 +53,7 @@ bool CCMSRoot::is_logged_in(Request *request) {
 }
 
 void CCMSRoot::index(Object *instance, Request *request) {
-	//ENSURE_LOGIN(request);
+	// ENSURE_LOGIN(request);
 
 	add_menu(instance, request);
 
@@ -98,24 +96,16 @@ void CCMSRoot::user_page_func(Object *instance, Request *request) {
 		add_menu(instance, request);
 	}
 
-	UserController::get_singleton()->handle_request_default(request);
-}
-
-void CCMSRoot::setup_routes() {
-	WebRoot::setup_routes();
-
-	index_func = HandlerInstance(index, this);
-	main_route_map["admin"] = HandlerInstance(admin_page_func, this);
-	main_route_map["user"] = HandlerInstance(user_page_func, this);
+	UserController::get_singleton()->handle_request_main(request);
 }
 
 void CCMSRoot::setup_middleware() {
-	middlewares.push_back(HandlerInstance(::SessionManager::session_setup_middleware));
-	// middlewares.push_back(HandlerInstance(::UserController::user_session_setup_middleware));
-	// middlewares.push_back(HandlerInstance(::RBACUserController::rbac_user_session_setup_middleware));
-	middlewares.push_back(HandlerInstance(::RBACUserController::rbac_default_user_session_middleware));
+	_middlewares.push_back(Ref<SessionSetupMiddleware>(new SessionSetupMiddleware()));
+	// _middlewares.push_back(Ref<UserSessionSetupMiddleware>(new UserSessionSetupMiddleware()));
+	// _middlewares.push_back(Ref<RBACUserSessionSetupMiddleware>(new RBACUserSessionSetupMiddleware()));
+	_middlewares.push_back(Ref<RBACDefaultUserSessionSetupMiddleware>(new RBACDefaultUserSessionSetupMiddleware()));
 
-	WebRoot::setup_middleware();
+	//WebRoot::setup_middleware();
 }
 
 void CCMSRoot::migrate() {

@@ -61,10 +61,6 @@ int main(int argc, char **argv, char **envp) {
 
 	app->set_root(app_root);
 
-	app_root->load_settings();
-	app_root->setup_routes();
-	app_root->setup_middleware();
-
 	app->add_listener("127.0.0.1", 8080);
 	LOG_INFO << "Server running on 127.0.0.1:8080";
 

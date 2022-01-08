@@ -43,7 +43,6 @@ public:
 	static void admin_page_func(Object *instance, Request *request);
 	static void user_page_func(Object *instance, Request *request);
 
-	virtual void setup_routes();
 	virtual void setup_middleware();
 
 	virtual void migrate();
