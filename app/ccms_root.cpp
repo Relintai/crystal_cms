@@ -27,6 +27,23 @@
 
 #include "menu/menu_node.h"
 
+void CCMSRoot::handle_request_main(Request *request) {
+	//this is a hack, until I have a simple index node, or port contentcontroller.
+	
+	if (try_send_wwwroot_file(request)) {
+		return;
+	}
+
+	if (request->get_path_segment_count() == 0) {
+		index(this, request);
+		return;
+	}
+
+	if (!try_route_request_to_children(request)) {
+		request->send_error(404);
+	}
+}
+
 bool CCMSRoot::is_logged_in(Request *request) {
 	if (!request->session) {
 		return false;
@@ -140,6 +157,7 @@ CCMSRoot::CCMSRoot() :
 		WebRoot() {
 
 	_user_controller = new CCMSUserController();
+	_user_controller->set_uri_segment("user");
 	// user_manager->set_path("./users/");
 	add_child(_user_controller);
 
@@ -149,6 +167,7 @@ CCMSRoot::CCMSRoot() :
 	_menu = new MenuNode();
 
 	_admin_panel = new AdminPanel();
+	_admin_panel->set_uri_segment("admin");
 	_admin_panel->register_admin_controller("rbac", _rbac_controller);
 	_admin_panel->register_admin_controller("menu", _menu);
 

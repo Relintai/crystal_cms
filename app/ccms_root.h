@@ -29,6 +29,8 @@ class CCMSRoot : public WebRoot {
 	RCPP_OBJECT(CCMSRoot, WebRoot);
 	
 public:
+	void handle_request_main(Request *request);
+
 	static bool is_logged_in(Request *request);
 
 	static void index(Object *instance, Request *request);
