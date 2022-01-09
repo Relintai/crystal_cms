@@ -50,7 +50,7 @@ void CCMSRoot::handle_request_main(Request *request) {
 }
 
 bool CCMSRoot::is_logged_in(Request *request) {
-	if (!request->session) {
+	if (!request->session.is_valid()) {
 		return false;
 	}
 
