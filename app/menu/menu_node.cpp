@@ -166,6 +166,8 @@ void MenuNode::render_menuentry_view(Request *request, MenudminEntryViewData *da
 
 	b.form()->method("POST")->action(aurl);
 	{
+		b.csrf_token(request);
+
 		b.w("Name:")->br();
 		b.input_text("name", name)->br();
 
@@ -363,6 +365,7 @@ void MenuNode::admin_render_menuentry_list(Request *request) {
 				if (i != 0) {
 					b.form()->method("POST")->action(request->get_url_root() + "up");
 					{
+						b.csrf_token(request);
 						b.input_hidden("id", String::num(e->id));
 						b.input_submit("Up");
 					}
@@ -378,6 +381,7 @@ void MenuNode::admin_render_menuentry_list(Request *request) {
 				if (i + 1 != _data->entries.size()) {
 					b.form()->method("POST")->action(request->get_url_root() + "down");
 					{
+						b.csrf_token(request);
 						b.input_hidden("id", String::num(e->id));
 						b.input_submit("Down");
 					}
@@ -392,6 +396,7 @@ void MenuNode::admin_render_menuentry_list(Request *request) {
 			{
 				b.form()->method("POST")->action(request->get_url_root() + "delete");
 				{
+					b.csrf_token(request);
 					b.input_hidden("id", String::num(e->id));
 					b.input_submit("Delete");
 				}
