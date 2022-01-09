@@ -37,7 +37,7 @@ void CCMSRoot::handle_request_main(Request *request) {
 
 	// this is a hack, until I have a simple index node, or port contentcontroller.
 	if (request->get_path_segment_count() == 0) {
-		index(request);
+		_handle_request_main(request);
 		return;
 	}
 
@@ -52,6 +52,15 @@ void CCMSRoot::handle_request_main(Request *request) {
 	handler->handle_request_main(request);
 }
 
+void CCMSRoot::_handle_request_main(Request *request) {
+	// ENSURE_LOGIN(request);
+
+	add_menu(request);
+
+	request->body += "test";
+	request->compile_and_send_body();
+}
+
 bool CCMSRoot::is_logged_in(Request *request) {
 	if (!request->session.is_valid()) {
 		return false;
@@ -60,15 +69,6 @@ bool CCMSRoot::is_logged_in(Request *request) {
 	Ref<User> u = request->reference_data["user"];
 
 	return u.is_valid();
-}
-
-void CCMSRoot::index(Request *request) {
-	// ENSURE_LOGIN(request);
-
-	add_menu(request);
-
-	request->body += "test";
-	request->compile_and_send_body();
 }
 
 void CCMSRoot::add_menu(Request *request) {

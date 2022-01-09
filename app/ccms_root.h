@@ -30,10 +30,9 @@ class CCMSRoot : public WebRoot {
 	
 public:
 	void handle_request_main(Request *request);
+	void _handle_request_main(Request *request);
 
 	bool is_logged_in(Request *request);
-
-	void index(Request *request);
 
 	void add_menu(Request *request);
 
