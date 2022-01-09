@@ -11,6 +11,7 @@
 #include "core/html/html_builder.h"
 #include "core/http/http_session.h"
 #include "core/http/session_manager.h"
+#include "core/http/csrf_token.h"
 
 #include "modules/users/user.h"
 //#include "modules/users/user_controller.h"
@@ -26,7 +27,9 @@
 #include "menu/menu_node.h"
 
 void CCMSRoot::handle_request_main(Request *request) {
-	process_middlewares(request);
+	if (process_middlewares(request)) {
+		return;
+	}
 
 	if (try_send_wwwroot_file(request)) {
 		return;
@@ -88,6 +91,14 @@ void CCMSRoot::setup_middleware() {
 	// _middlewares.push_back(Ref<UserSessionSetupMiddleware>(new UserSessionSetupMiddleware()));
 	// _middlewares.push_back(Ref<RBACUserSessionSetupMiddleware>(new RBACUserSessionSetupMiddleware()));
 	_middlewares.push_back(Ref<RBACDefaultUserSessionSetupMiddleware>(new RBACDefaultUserSessionSetupMiddleware()));
+
+	Ref<CSRFTokenMiddleware> csrf_middleware;
+	csrf_middleware.instance();
+
+	csrf_middleware->ignored_urls.push_back("/user/login");
+	csrf_middleware->ignored_urls.push_back("/user/register");
+
+	_middlewares.push_back(csrf_middleware);
 
 	// WebRoot::setup_middleware();
 }
