@@ -28,7 +28,7 @@ void MenuNode::render(Request *request) {
 
 				b.li();
 				{
-					b.a("/" + e->url)->f()->w(e->url)->ca();
+					b.a("/" + e->url)->w(e->url)->ca();
 				}
 				b.cli();
 			}
@@ -167,14 +167,14 @@ void MenuNode::render_menuentry_view(Request *request, MenudminEntryViewData *da
 	b.form()->method("POST")->action(aurl);
 	{
 		b.w("Name:")->br();
-		b.input_text("name", name)->f()->br();
+		b.input_text("name", name)->br();
 
 		b.w("URL:")->br();
-		b.input_text("url", url)->f()->br();
+		b.input_text("url", url)->br();
 
 		if (!editing) {
 			b.w("Create Page?");
-			b.input_checkbox("create_page", "create_page")->checked()->f()->br();
+			b.input_checkbox("create_page", "create_page", true)->br();
 		}
 
 		b.br();
