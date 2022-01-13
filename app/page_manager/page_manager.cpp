@@ -409,45 +409,59 @@ void PageManager::admin_render_menuentry_list(Request *request) {
 
 // DB
 
-Vector<Ref<Page> > PageManager::db_load() {
-	/*
-	Ref<MenuData> data;
-	data.instance();
+Vector<Ref<Page> > PageManager::db_load_pages() {
+	Vector<Ref<Page> > data;
 
 	Ref<QueryBuilder> qb = get_query_builder();
 
-	qb->select("id,name,url,sort_order")->from(_table);
+	qb->select("id,name,url,page_type,deleted")->from(_table);
 	Ref<QueryResult> res = qb->run();
 
 	while (res->next_row()) {
-		Ref<MenuDataEntry> e;
-		e.instance();
+		Ref<Page> p;
+		p.instance();
 
-		e->id = res->get_cell_int(0);
-		e->name = res->get_cell_str(1);
-		e->url = res->get_cell_str(2);
-		e->sort_order = res->get_cell_int(3);
+		p->id = res->get_cell_int(0);
+		p->name = res->get_cell_str(1);
+		p->url = res->get_cell_str(2);
+		p->page_type = res->get_cell_int(3);
+		p->deleted = res->get_cell_int(4);
 
-		data->entries.push_back(e);
+		data.push_back(p);
 	}
 
-	data->sort_entries();
-
 	return data;
-	*/
-
-	return Vector<Ref<Page> >();
 }
 
-void PageManager::db_save(const Ref<Page> &page) {
+void PageManager::db_save_page(const Ref<Page> &page) {
+	Ref<QueryBuilder> qb = get_query_builder();
 
-	/*
-	//only save the page itself
-	for (int i = 0; i < menu->entries.size(); ++i) {
-		Ref<MenuDataEntry> entry = menu->entries[i];
+	if (page->id == 0) {
+		qb->insert(_table, "name,url,page_type,deleted")->values();
+		qb->val(page->name);
+		qb->val(page->url);
+		qb->val(page->page_type);
+		qb->val(page->deleted);
+		qb->cvalues();
+		qb->select_last_insert_id();
+		Ref<QueryResult> res = qb->run();
+		// qb->print();
 
-		db_save_menu_entry(entry);
-	}*/
+		Ref<Page> e = page;
+
+		e->id = res->get_last_insert_rowid();
+	} else {
+		qb->update(_table)->set();
+		qb->setp("name", page->name);
+		qb->setp("url", page->url);
+		qb->setp("page_type", page->page_type);
+		qb->setp("deleted", page->deleted);
+		qb->cset();
+		qb->where()->wp("id", page->id);
+		qb->end_command();
+		qb->run_query();
+		// qb->print();
+	}
 }
 
 void PageManager::db_save_page_content(const Ref<PageContent> &entry) {
@@ -494,7 +508,8 @@ void PageManager::create_table() {
 	tb->integer("id")->auto_increment()->next_row();
 	tb->varchar("name", 60)->not_null()->next_row();
 	tb->varchar("url", 500)->not_null()->next_row();
-	tb->integer("sort_order")->not_null()->next_row();
+	tb->tiny_integer("page_type")->not_null()->defval(0)->next_row();
+	tb->tiny_integer("deleted")->not_null()->defval(0)->next_row();
 	tb->primary_key("id");
 	tb->ccreate_table();
 	tb->run_query();

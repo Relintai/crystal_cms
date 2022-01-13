@@ -9,11 +9,10 @@ class Page : public Resource {
 	RCPP_OBJECT(Page, Resource);
 
 public:
-	int rank_id;
 	String name;
 	String url;
-	int sort_order;
-	int permissions;
+	int page_type;
+	int deleted;
 
 	Page();
 	~Page();

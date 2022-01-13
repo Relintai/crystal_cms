@@ -42,9 +42,9 @@ public:
 
 	//db
 
-	virtual Vector<Ref<Page> > db_load();
+	virtual Vector<Ref<Page> > db_load_pages();
 
-	virtual void db_save(const Ref<Page> &page);
+	virtual void db_save_page(const Ref<Page> &page);
 	virtual void db_save_page_content(const Ref<PageContent> &entry);
 	virtual void db_delete_page(const int id);
 
