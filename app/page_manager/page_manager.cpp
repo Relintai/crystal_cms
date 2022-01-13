@@ -38,11 +38,11 @@ void PageManager::admin_handle_request_main(Request *request) {
 	} else if (seg == "new_entry") {
 		request->push_path();
 
-		admin_handle_new_menuentry(request);
+		admin_handle_new_page(request);
 	} else if (seg == "edit_entry") {
 		request->push_path();
 
-		admin_handle_edit_menuentry(request);
+		admin_handle_edit_page(request);
 	} else if (seg == "up") {
 		request->push_path();
 
@@ -109,40 +109,42 @@ void PageManager::admin_render_page_list(Request *request) {
 }
 
 
-void PageManager::admin_handle_new_menuentry(Request *request) {
-	/*
+void PageManager::admin_handle_new_page(Request *request) {
 	if (request->get_method() == HTTP_METHOD_POST) {
-		Ref<MenuDataEntry> entry;
+		Ref<Page> entry;
 		entry.instance();
 
 		entry->name = request->get_parameter("name");
 		entry->url = request->get_parameter("url");
-		entry->sort_order = _data->entries.size() + 1;
+		entry->page_type = PAGE_TYPE_PAGE;
+		entry->deleted = 0;
 
-		db_save_menu_entry(entry);
+		db_save_page(entry);
 
-		_data->entries.push_back(entry);
+		invalidate_cache();
 
+		//this should probably go back to the list itself. TODO
 		request->send_redirect(request->get_url_root_parent() + "edit_entry/" + String::num(entry->id));
 
 		return;
 	}
 
-	MenudminEntryViewData data;
-	render_menuentry_view(request, &data);
-	*/
+	PageAdminEntryViewData data;
+	render_page_view(request, &data);
 }
 
-void PageManager::admin_handle_edit_menuentry(Request *request) {
-	/*
+void PageManager::admin_handle_edit_page(Request *request) {
 	String seg = request->get_current_path_segment();
 
 	int id = seg.to_int();
 
-	Ref<MenuDataEntry> entry;
+	Ref<Page> entry;
 
-	for (int i = 0; i < _data->entries.size(); ++i) {
-		Ref<MenuDataEntry> e = _data->entries[i];
+	//todo only get the relevant from the db
+	Vector<Ref<Page> > pages = db_get_pages();
+
+	for (int i = 0; i < pages.size(); ++i) {
+		Ref<Page> e = pages[i];
 
 		if (e->id == id) {
 			entry = e;
@@ -156,36 +158,32 @@ void PageManager::admin_handle_edit_menuentry(Request *request) {
 		return;
 	}
 
-	MenudminEntryViewData data;
+	PageAdminEntryViewData data;
 	data.entry = entry;
 
 	if (request->get_method() == HTTP_METHOD_POST) {
 		entry->name = request->get_parameter("name");
 		entry->url = request->get_parameter("url");
 
-		db_save_menu_entry(entry);
+		db_save_page(entry);
+
+		invalidate_cache();
 
 		data.messages.push_back("Save Success!");
 	}
 
-	render_menuentry_view(request, &data);
-	*/
+	render_page_view(request, &data);
 }
 
-void PageManager::render_menuentry_view(Request *request, MenudminEntryViewData *data) {
-	/*
+void PageManager::render_page_view(Request *request, PageAdminEntryViewData *data) {
 	int id = 0;
 	String name = "";
 	String url = "";
-	int sort_order = 0;
-	bool editing = false;
 
 	if (data->entry.is_valid()) {
 		id = data->entry->id;
 		name = data->entry->name;
 		url = data->entry->url;
-		sort_order = data->entry->sort_order;
-		editing = true;
 	}
 
 	HTMLBuilder b;
@@ -215,18 +213,12 @@ void PageManager::render_menuentry_view(Request *request, MenudminEntryViewData 
 		b.w("URL:")->br();
 		b.input_text("url", url)->br();
 
-		if (!editing) {
-			b.w("Create Page?");
-			b.input_checkbox("create_page", "create_page", true)->br();
-		}
-
 		b.br();
 		b.input()->type("submit")->value("Save");
 	}
 	b.cform();
 
 	request->body += b.result;
-	*/
 }
 
 void PageManager::admin_handle_up(Request *request) {
@@ -386,6 +378,10 @@ void PageManager::admin_add_section_links(Vector<AdminSectionLinkInfo> *links) {
 	links->push_back(AdminSectionLinkInfo("Editor", ""));
 }
 
+void PageManager::invalidate_cache() {
+
+}
+
 // DB
 
 Vector<Ref<Page> > PageManager::db_get_pages() {
@@ -394,6 +390,7 @@ Vector<Ref<Page> > PageManager::db_get_pages() {
 	Ref<QueryBuilder> qb = get_query_builder();
 
 	qb->select("id,name,url,page_type,deleted")->from(_table);
+	qb->where()->wp("deleted", 0);
 	Ref<QueryResult> res = qb->run();
 
 	while (res->next_row()) {

@@ -16,6 +16,10 @@ class PageManager : public AdminNode {
 	RCPP_OBJECT(PageManager, AdminNode);
 
 public:
+	enum PageType {
+		PAGE_TYPE_PAGE = 0,
+	};
+
 	void _handle_request_main(Request *request);
 
 	void create_validators();
@@ -26,18 +30,20 @@ public:
 
 	void admin_render_page_list(Request *request);
 
-	struct MenudminEntryViewData {
-		//Ref<MenuDataEntry> entry;
+	struct PageAdminEntryViewData {
+		Ref<Page> entry;
 		Vector<String> messages;
 	};
 
-	void admin_handle_new_menuentry(Request *request);
-	void admin_handle_edit_menuentry(Request *request);
-	void render_menuentry_view(Request *request, MenudminEntryViewData *data);
+	void admin_handle_new_page(Request *request);
+	void admin_handle_edit_page(Request *request);
+	void render_page_view(Request *request, PageAdminEntryViewData *data);
 
 	void admin_handle_up(Request *request);
 	void admin_handle_down(Request *request);
 	void admin_handle_delete(Request *request);
+
+	void invalidate_cache();
 
 	//void invalidate_cache(String page);
 	//Page -> owner (PageManager*) -> when changes 
