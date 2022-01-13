@@ -34,8 +34,8 @@ import traceback
 folders = [
     'app',
     'app/menu',
-    #'app/page_manager',
-    #'app/page_manager/content',
+    'app/page_manager',
+    'app/page_manager/content',
 ]
 
 module_folders = [

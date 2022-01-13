@@ -15,6 +15,9 @@
 #include "core/database/query_result.h"
 #include "core/database/table_builder.h"
 
+#include "page_content.h"
+#include "page.h"
+
 void PageManager::create_validators() {
 }
 
@@ -48,6 +51,7 @@ void PageManager::admin_handle_request_main(Request *request) {
 }
 
 void PageManager::admin_handle_new_menuentry(Request *request) {
+	/*
 	if (request->get_method() == HTTP_METHOD_POST) {
 		Ref<MenuDataEntry> entry;
 		entry.instance();
@@ -67,9 +71,11 @@ void PageManager::admin_handle_new_menuentry(Request *request) {
 
 	MenudminEntryViewData data;
 	render_menuentry_view(request, &data);
+	*/
 }
 
 void PageManager::admin_handle_edit_menuentry(Request *request) {
+	/*
 	String seg = request->get_current_path_segment();
 
 	int id = seg.to_int();
@@ -104,9 +110,11 @@ void PageManager::admin_handle_edit_menuentry(Request *request) {
 	}
 
 	render_menuentry_view(request, &data);
+	*/
 }
 
 void PageManager::render_menuentry_view(Request *request, MenudminEntryViewData *data) {
+	/*
 	int id = 0;
 	String name = "";
 	String url = "";
@@ -159,9 +167,11 @@ void PageManager::render_menuentry_view(Request *request, MenudminEntryViewData 
 	b.cform();
 
 	request->body += b.result;
+	*/
 }
 
 void PageManager::admin_handle_up(Request *request) {
+	/*
 	String pid = request->get_parameter("id");
 
 	if (!pid.is_int()) {
@@ -210,9 +220,11 @@ void PageManager::admin_handle_up(Request *request) {
 
 	//_data->write_unlock()
 	request->send_redirect(request->get_url_root_parent());
+	*/
 }
 
 void PageManager::admin_handle_down(Request *request) {
+	/*
 	String pid = request->get_parameter("id");
 
 	if (!pid.is_int()) {
@@ -261,9 +273,11 @@ void PageManager::admin_handle_down(Request *request) {
 
 	//_data->write_unlock()
 	request->send_redirect(request->get_url_root_parent());
+	*/
 }
 
 void PageManager::admin_handle_delete(Request *request) {
+	/*
 	String pid = request->get_parameter("id");
 
 	if (!pid.is_int()) {
@@ -302,6 +316,7 @@ void PageManager::admin_handle_delete(Request *request) {
 
 	//_data->write_unlock()
 	request->send_redirect(request->get_url_root_parent());
+	*/
 }
 
 String PageManager::admin_get_section_name() {
@@ -313,6 +328,7 @@ void PageManager::admin_add_section_links(Vector<AdminSectionLinkInfo> *links) {
 }
 
 void PageManager::admin_render_menuentry_list(Request *request) {
+	/*
 	HTMLBuilder b;
 
 	b.h4()->f()->a()->href(request->get_url_root_parent())->f()->w("&lt;- Back")->ca()->ch4();
@@ -388,24 +404,13 @@ void PageManager::admin_render_menuentry_list(Request *request) {
 	b.ca();
 
 	request->body += b.result;
-}
-
-void PageManager::initialize() {
-	_data = db_load();
-}
-
-Ref<MenuData> PageManager::get_data() {
-	return _data;
-}
-
-bool PageManager::continue_on_missing_default_rank() {
-	// todo, add setting
-	return false;
+	*/
 }
 
 // DB
 
-Ref<MenuData> PageManager::db_load() {
+Vector<Ref<Page> > PageManager::db_load() {
+	/*
 	Ref<MenuData> data;
 	data.instance();
 
@@ -429,17 +434,24 @@ Ref<MenuData> PageManager::db_load() {
 	data->sort_entries();
 
 	return data;
+	*/
+
+	return Vector<Ref<Page> >();
 }
 
-void PageManager::db_save(const Ref<MenuData> &menu) {
+void PageManager::db_save(const Ref<Page> &page) {
+
+	/*
+	//only save the page itself
 	for (int i = 0; i < menu->entries.size(); ++i) {
 		Ref<MenuDataEntry> entry = menu->entries[i];
 
 		db_save_menu_entry(entry);
-	}
+	}*/
 }
 
-void PageManager::db_save_menu_entry(const Ref<MenuDataEntry> &entry) {
+void PageManager::db_save_page_content(const Ref<PageContent> &entry) {
+	/*
 	Ref<QueryBuilder> qb = get_query_builder();
 
 	if (entry->id == 0) {
@@ -465,9 +477,10 @@ void PageManager::db_save_menu_entry(const Ref<MenuDataEntry> &entry) {
 		qb->run_query();
 		// qb->print();
 	}
+	*/
 }
 
-void PageManager::db_delete_menu_entry(const int id) {
+void PageManager::db_delete_page(const int id) {
 	Ref<QueryBuilder> qb = get_query_builder();
 
 	qb->del(_table)->where()->wp("id", id);
@@ -502,6 +515,16 @@ void PageManager::migrate() {
 void PageManager::create_default_entries() {
 }
 
+void PageManager::initialize() {
+	_table = _table_prefix;
+
+	if (_table.size() > 0) {
+		_table += '_';
+	}
+
+	_table += "pages";
+}
+
 void PageManager::_notification(int what) {
 	if (what == Node::NOTIFICATION_ENTER_TREE) {
 		initialize();
@@ -510,8 +533,6 @@ void PageManager::_notification(int what) {
 
 PageManager::PageManager() :
 		AdminNode() {
-
-	_table = "menu";
 }
 
 PageManager::~PageManager() {

@@ -9,6 +9,9 @@
 class Request;
 class FormValidator;
 
+class Page;
+class PageContent;
+
 class PageManager : public AdminNode {
 	RCPP_OBJECT(PageManager, AdminNode);
 
@@ -22,7 +25,7 @@ public:
 	void admin_render_menuentry_list(Request *request);
 
 	struct MenudminEntryViewData {
-		Ref<MenuDataEntry> entry;
+		//Ref<MenuDataEntry> entry;
 		Vector<String> messages;
 	};
 
@@ -34,36 +37,34 @@ public:
 	void admin_handle_down(Request *request);
 	void admin_handle_delete(Request *request);
 
-	void initialize();
-
-	Ref<MenuData> get_data();
-
-	String &get_redirect_url();
-
-	bool continue_on_missing_default_rank();
+	//void invalidate_cache(String page);
+	//Page -> owner (PageManager*) -> when changes 
 
 	//db
 
-	virtual Ref<MenuData> db_load();
+	virtual Vector<Ref<Page> > db_load();
 
-	virtual void db_save(const Ref<MenuData> &menu);
-	virtual void db_save_menu_entry(const Ref<MenuDataEntry> &entry);
-	virtual void db_delete_menu_entry(const int id);
+	virtual void db_save(const Ref<Page> &page);
+	virtual void db_save_page_content(const Ref<PageContent> &entry);
+	virtual void db_delete_page(const int id);
 
 	void create_table();
 	void drop_table();
 	void migrate();
 	void create_default_entries();
 
+	virtual void initialize();
 	void _notification(int what);
 
 	PageManager();
 	~PageManager();
 
 protected:
+	String _table_prefix;
 	String _table;
 
-	Ref<MenuData> _data;
+	//rwlock _cache_lock;
+	//map<Sting, Page> _page_cache;
 };
 
 #endif
