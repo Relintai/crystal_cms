@@ -1,6 +1,7 @@
 #include "page_manager.h"
 
 #include "core/error_macros.h"
+#include "core/nodes/node_tree.h"
 
 #include "core/html/form_validator.h"
 #include "core/html/html_builder.h"
@@ -18,6 +19,12 @@
 #include "page_content.h"
 #include "page.h"
 
+void PageManager::_handle_request_main(Request *request) {
+
+	request->body += "PageManagerTest";
+	request->compile_and_send_body();
+}
+
 void PageManager::create_validators() {
 }
 
@@ -25,7 +32,7 @@ void PageManager::admin_handle_request_main(Request *request) {
 	String seg = request->get_current_path_segment();
 
 	if (seg == "") {
-		admin_render_menuentry_list(request);
+		admin_render_page_list(request);
 		return;
 	} else if (seg == "new_entry") {
 		request->push_path();
@@ -49,6 +56,57 @@ void PageManager::admin_handle_request_main(Request *request) {
 		admin_handle_delete(request);
 	}
 }
+
+
+void PageManager::admin_render_page_list(Request *request) {
+	HTMLBuilder b;
+
+	b.h4()->f()->a()->href(request->get_url_root_parent())->f()->w("&lt;- Back")->ca()->ch4();
+	b.h4()->f()->w("Page Editor")->ch4();
+	b.style()->f()->w("li { display: inline-block; }")->cstyle();
+
+	Vector<Ref<Page> > pages = db_get_pages();
+
+	for (int i = 0; i < pages.size(); ++i) {
+		Ref<Page> e = pages[i];
+
+		if (!e.is_valid()) {
+			continue;
+		}
+
+		b.div()->cls("row")->f()->ul();
+		{
+			b.li();
+			{
+				b.a()->href(request->get_url_root("edit_entry/") + String::num(e->id));
+				b.w("id: ")->wn(e->id)->w(" name: ")->w(e->name)->w(" url: ")->w(e->url);
+				b.ca();
+			}
+			b.cli();
+
+			b.li();
+			{
+				b.form_post(request->get_url_root() + "delete", request);
+				{
+					b.input_hidden("id", String::num(e->id));
+					b.input_submit("Delete");
+				}
+				b.cform();
+			}
+			b.cli();
+		}
+		b.cul()->cdiv();
+	}
+
+	b.br();
+
+	b.a()->href(request->get_url_root("new_entry"));
+	b.w("New Entry");
+	b.ca();
+
+	request->body += b.result;
+}
+
 
 void PageManager::admin_handle_new_menuentry(Request *request) {
 	/*
@@ -320,96 +378,16 @@ void PageManager::admin_handle_delete(Request *request) {
 }
 
 String PageManager::admin_get_section_name() {
-	return "Menu Editor";
+	return "Page Editor";
 }
 
 void PageManager::admin_add_section_links(Vector<AdminSectionLinkInfo> *links) {
 	links->push_back(AdminSectionLinkInfo("Editor", ""));
 }
 
-void PageManager::admin_render_menuentry_list(Request *request) {
-	/*
-	HTMLBuilder b;
-
-	b.h4()->f()->a()->href(request->get_url_root_parent())->f()->w("&lt;- Back")->ca()->ch4();
-	b.h4()->f()->w("Menu Editor")->ch4();
-	b.style()->f()->w("li { display: inline-block; }")->cstyle();
-
-	for (int i = 0; i < _data->entries.size(); ++i) {
-		Ref<MenuDataEntry> e = _data->entries[i];
-
-		if (!e.is_valid()) {
-			continue;
-		}
-
-		b.div()->cls("row")->f()->ul();
-		{
-			b.li();
-			b.a()->href(request->get_url_root("edit_entry/") + String::num(e->id));
-			b.w("id: ")->wn(e->id)->w(" name: ")->w(e->name)->w(" url: ")->w(e->url);
-			b.ca();
-			b.cli();
-
-			b.li();
-			{
-				if (i != 0) {
-					b.form()->method("POST")->action(request->get_url_root() + "up");
-					{
-						b.csrf_token(request);
-						b.input_hidden("id", String::num(e->id));
-						b.input_submit("Up");
-					}
-					b.cform();
-				} else {
-					b.w("Up");
-				}
-			}
-			b.cli();
-
-			b.li();
-			{
-				if (i + 1 != _data->entries.size()) {
-					b.form()->method("POST")->action(request->get_url_root() + "down");
-					{
-						b.csrf_token(request);
-						b.input_hidden("id", String::num(e->id));
-						b.input_submit("Down");
-					}
-					b.cform();
-				} else {
-					b.w("Down");
-				}
-			}
-			b.cli();
-
-			b.li();
-			{
-				b.form()->method("POST")->action(request->get_url_root() + "delete");
-				{
-					b.csrf_token(request);
-					b.input_hidden("id", String::num(e->id));
-					b.input_submit("Delete");
-				}
-				b.cform();
-			}
-			b.cli();
-		}
-		b.cul()->cdiv();
-	}
-
-	b.br();
-
-	b.a()->href(request->get_url_root("new_entry"));
-	b.w("New Menu Entry");
-	b.ca();
-
-	request->body += b.result;
-	*/
-}
-
 // DB
 
-Vector<Ref<Page> > PageManager::db_load_pages() {
+Vector<Ref<Page> > PageManager::db_get_pages() {
 	Vector<Ref<Page> > data;
 
 	Ref<QueryBuilder> qb = get_query_builder();

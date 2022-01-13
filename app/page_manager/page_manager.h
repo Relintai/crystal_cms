@@ -16,13 +16,15 @@ class PageManager : public AdminNode {
 	RCPP_OBJECT(PageManager, AdminNode);
 
 public:
+	void _handle_request_main(Request *request);
+
 	void create_validators();
 
 	void admin_handle_request_main(Request *request);
 	String admin_get_section_name();
 	void admin_add_section_links(Vector<AdminSectionLinkInfo> *links);
 
-	void admin_render_menuentry_list(Request *request);
+	void admin_render_page_list(Request *request);
 
 	struct MenudminEntryViewData {
 		//Ref<MenuDataEntry> entry;
@@ -42,7 +44,7 @@ public:
 
 	//db
 
-	virtual Vector<Ref<Page> > db_load_pages();
+	virtual Vector<Ref<Page> > db_get_pages();
 
 	virtual void db_save_page(const Ref<Page> &page);
 	virtual void db_save_page_content(const Ref<PageContent> &entry);
