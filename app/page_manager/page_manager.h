@@ -39,8 +39,6 @@ public:
 	void admin_handle_edit_page(Request *request);
 	void render_page_view(Request *request, PageAdminEntryViewData *data);
 
-	void admin_handle_up(Request *request);
-	void admin_handle_down(Request *request);
 	void admin_handle_delete(Request *request);
 
 	void invalidate_cache();

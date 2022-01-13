@@ -43,14 +43,6 @@ void PageManager::admin_handle_request_main(Request *request) {
 		request->push_path();
 
 		admin_handle_edit_page(request);
-	} else if (seg == "up") {
-		request->push_path();
-
-		admin_handle_up(request);
-	} else if (seg == "down") {
-		request->push_path();
-
-		admin_handle_down(request);
 	} else if (seg == "delete") {
 		request->push_path();
 
@@ -219,112 +211,6 @@ void PageManager::render_page_view(Request *request, PageAdminEntryViewData *dat
 	b.cform();
 
 	request->body += b.result;
-}
-
-void PageManager::admin_handle_up(Request *request) {
-	/*
-	String pid = request->get_parameter("id");
-
-	if (!pid.is_int()) {
-		request->send_redirect(request->get_url_root_parent());
-		return;
-	}
-
-	int id = pid.to_int();
-
-	// TODO
-	// Also lock everywhere else
-	//_data->write_lock()
-
-	for (int i = 0; i < _data->entries.size(); ++i) {
-		Ref<MenuDataEntry> e = _data->entries[i];
-
-		if (e->id == id) {
-			if (e->sort_order == 0) {
-				RLOG_ERR("MenuEditor->up: Up operation on 0th element!");
-				break;
-			}
-
-			int aso = e->sort_order - 1;
-			Ref<MenuDataEntry> above;
-
-			for (int j = 0; j < _data->entries.size(); ++j) {
-				Ref<MenuDataEntry> ae = _data->entries[j];
-
-				if (ae->sort_order == aso) {
-					above = ae;
-					break;
-				}
-			}
-
-			if (above.is_valid()) {
-				above->sort_order += 1;
-				db_save_menu_entry(above);
-			}
-
-			e->sort_order -= 1;
-			db_save_menu_entry(e);
-			_data->sort_entries();
-			break;
-		}
-	}
-
-	//_data->write_unlock()
-	request->send_redirect(request->get_url_root_parent());
-	*/
-}
-
-void PageManager::admin_handle_down(Request *request) {
-	/*
-	String pid = request->get_parameter("id");
-
-	if (!pid.is_int()) {
-		request->send_redirect(request->get_url_root_parent());
-		return;
-	}
-
-	int id = pid.to_int();
-
-	// TODO
-	// Also lock everywhere else
-	//_data->write_lock()
-
-	for (int i = 0; i < _data->entries.size(); ++i) {
-		Ref<MenuDataEntry> e = _data->entries[i];
-
-		if (e->id == id) {
-			if (e->sort_order == _data->entries.size()) {
-				RLOG_ERR("MenuEditor->down: Down operation on the last element!");
-				break;
-			}
-
-			int bso = e->sort_order + 1;
-			Ref<MenuDataEntry> below;
-
-			for (int j = 0; j < _data->entries.size(); ++j) {
-				Ref<MenuDataEntry> be = _data->entries[j];
-
-				if (be->sort_order == bso) {
-					below = be;
-					break;
-				}
-			}
-
-			if (below.is_valid()) {
-				below->sort_order -= 1;
-				db_save_menu_entry(below);
-			}
-
-			e->sort_order += 1;
-			db_save_menu_entry(e);
-			_data->sort_entries();
-			break;
-		}
-	}
-
-	//_data->write_unlock()
-	request->send_redirect(request->get_url_root_parent());
-	*/
 }
 
 void PageManager::admin_handle_delete(Request *request) {
