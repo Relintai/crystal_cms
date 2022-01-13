@@ -12,12 +12,14 @@
 #include "modules/message_page/message_page.h"
 #include "modules/paged_article/paged_article.h"
 #include "modules/paged_list/paged_list.h"
+#include "page_manager/page_manager.h"
 
 class AdminPanel;
 class RBACController;
 class RBACModel;
 class UserController;
 class MenuNode;
+class PageManager;
 
 #define ENSURE_LOGIN(request)                  \
 	if (!is_logged_in(request)) {              \
@@ -32,9 +34,9 @@ public:
 	void handle_request_main(Request *request);
 	void _handle_request_main(Request *request);
 
-	bool is_logged_in(Request *request);
+	void _render_menu(Request *request);
 
-	void add_menu(Request *request);
+	bool is_logged_in(Request *request);
 
 	void setup_middleware();
 	void migrate();
@@ -48,6 +50,7 @@ public:
 	RBACController *_rbac_controller;
 	UserController *_user_controller;
 	MenuNode *_menu;
+	PageManager *_page_manager;
 
 	static std::string menu_head;
 	static std::string footer;

@@ -20,6 +20,7 @@
 #include "page.h"
 
 void PageManager::_handle_request_main(Request *request) {
+	render_menu(request);
 
 	request->body += "PageManagerTest";
 	request->compile_and_send_body();

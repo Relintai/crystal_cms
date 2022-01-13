@@ -9,9 +9,9 @@
 #include "core/database/database_manager.h"
 
 #include "core/html/html_builder.h"
+#include "core/http/csrf_token.h"
 #include "core/http/http_session.h"
 #include "core/http/session_manager.h"
-#include "core/http/csrf_token.h"
 
 #include "modules/users/user.h"
 //#include "modules/users/user_controller.h"
@@ -37,41 +37,31 @@ void CCMSRoot::handle_request_main(Request *request) {
 
 	// this is a hack, until I have a simple index node, or port contentcontroller.
 	if (request->get_path_segment_count() == 0) {
-		_handle_request_main(request);
+		_page_manager->handle_request_main(request);
 		return;
 	}
 
 	WebNode *handler = get_request_handler_child(request);
 
 	if (!handler) {
-		request->send_error(404);
+		// request->send_error(404);
+		_page_manager->handle_request_main(request);
 		return;
 	}
 
-	add_menu(request);
 	handler->handle_request_main(request);
 }
 
 void CCMSRoot::_handle_request_main(Request *request) {
 	// ENSURE_LOGIN(request);
 
-	add_menu(request);
+	_render_menu(request);
 
 	request->body += "test";
 	request->compile_and_send_body();
 }
 
-bool CCMSRoot::is_logged_in(Request *request) {
-	if (!request->session.is_valid()) {
-		return false;
-	}
-
-	Ref<User> u = request->reference_data["user"];
-
-	return u.is_valid();
-}
-
-void CCMSRoot::add_menu(Request *request) {
+void CCMSRoot::_render_menu(Request *request) {
 	request->head += menu_head;
 
 	_menu->render(request);
@@ -82,8 +72,17 @@ void CCMSRoot::add_menu(Request *request) {
 	b.write_tag();
 
 	request->body += b.result;
-
 	request->footer = footer;
+}
+
+bool CCMSRoot::is_logged_in(Request *request) {
+	if (!request->session.is_valid()) {
+		return false;
+	}
+
+	Ref<User> u = request->reference_data["user"];
+
+	return u.is_valid();
 }
 
 void CCMSRoot::setup_middleware() {
@@ -141,6 +140,10 @@ void CCMSRoot::compile_menu() {
 CCMSRoot::CCMSRoot() :
 		WebRoot() {
 
+	_page_manager = new PageManager();
+	_page_manager->set_uri_segment("/");
+	add_child(_page_manager);
+
 	_user_controller = new CCMSUserController();
 	_user_controller->set_uri_segment("user");
 	// user_manager->set_path("./users/");
@@ -155,6 +158,7 @@ CCMSRoot::CCMSRoot() :
 	_admin_panel->set_uri_segment("admin");
 	_admin_panel->register_admin_controller("rbac", _rbac_controller);
 	_admin_panel->register_admin_controller("menu", _menu);
+	_admin_panel->register_admin_controller("page_manager", _page_manager);
 
 	_admin_panel->add_child(_rbac_controller);
 	_admin_panel->add_child(_menu);
