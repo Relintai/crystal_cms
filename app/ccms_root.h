@@ -39,7 +39,6 @@ public:
 	bool is_logged_in(Request *request);
 
 	void setup_middleware();
-	void migrate();
 
 	void compile_menu();
 

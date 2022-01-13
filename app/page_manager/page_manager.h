@@ -56,7 +56,6 @@ public:
 
 	void create_table();
 	void drop_table();
-	void migrate();
 	void create_default_entries();
 
 	virtual void initialize();

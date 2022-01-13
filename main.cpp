@@ -9,8 +9,8 @@
 
 #include "database/db_init.h"
 
-#include "core/settings/settings.h"
 #include "core/settings/db_settings.h"
+#include "core/settings/settings.h"
 
 #include "core/http/session_manager.h"
 
@@ -78,7 +78,14 @@ int main(int argc, char **argv, char **envp) {
 
 		settings->migrate();
 		session_manager->migrate();
-		app_root->migrate();
+
+		bool seed_db = Platform::get_singleton()->arg_parser.has_arg("-s");
+
+		if (seed_db) {
+			printf("Seeding database.\n");
+		}
+
+		app_root->migrate(true, seed_db);
 	}
 
 	delete app;

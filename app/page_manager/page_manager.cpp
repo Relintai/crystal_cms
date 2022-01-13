@@ -383,11 +383,6 @@ void PageManager::drop_table() {
 	tb->drop_table_if_exists(_table)->run_query();
 	// tb->print();
 }
-void PageManager::migrate() {
-	drop_table();
-	create_table();
-	create_default_entries();
-}
 
 void PageManager::create_default_entries() {
 }

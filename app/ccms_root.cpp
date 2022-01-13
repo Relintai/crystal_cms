@@ -102,18 +102,6 @@ void CCMSRoot::setup_middleware() {
 	// WebRoot::setup_middleware();
 }
 
-void CCMSRoot::migrate() {
-	_rbac_controller->migrate();
-	_user_controller->migrate();
-
-	if (Platform::get_singleton()->arg_parser.has_arg("-u")) {
-		printf("Creating test users.\n");
-		_user_controller->create_test_users();
-	}
-
-	_menu->migrate();
-}
-
 void CCMSRoot::compile_menu() {
 	HTMLBuilder bh;
 

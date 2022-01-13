@@ -57,7 +57,6 @@ public:
 
 	void create_table();
 	void drop_table();
-	void migrate();
 	void create_default_entries();
 
 	void _notification(int what);
