@@ -2,18 +2,18 @@
 
 #include "core/error_macros.h"
 
-#include "core/html/form_validator.h"
-#include "core/html/html_builder.h"
-#include "core/http/cookie.h"
-#include "core/http/http_session.h"
-#include "core/http/request.h"
-#include "core/http/session_manager.h"
+#include "web/html/form_validator.h"
+#include "web/html/html_builder.h"
+#include "web/http/cookie.h"
+#include "web/http/http_session.h"
+#include "web/http/request.h"
+#include "web/http/session_manager.h"
 
-#include "core/database/database.h"
-#include "core/database/database_manager.h"
-#include "core/database/query_builder.h"
-#include "core/database/query_result.h"
-#include "core/database/table_builder.h"
+#include "database/database.h"
+#include "database/database_manager.h"
+#include "database/query_builder.h"
+#include "database/query_result.h"
+#include "database/table_builder.h"
 
 void MenuNode::render(Request *request) {
 	HTMLBuilder b;

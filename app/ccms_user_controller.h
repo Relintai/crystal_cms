@@ -1,10 +1,10 @@
 #ifndef CCMS_USER_CONTROLLER_H
 #define CCMS_USER_CONTROLLER_H
 
-#include "modules/rbac_users/rbac_user_controller.h"
+#include "web_modules/rbac_users/rbac_user_controller.h"
 
 #include <string>
-#include "modules/users/user.h"
+#include "web_modules/users/user.h"
 
 class Request;
 class FormValidator;

@@ -1,7 +1,7 @@
 #ifndef MENU_NODE_H
 #define MENU_NODE_H
 
-#include "modules/admin_panel/admin_node.h"
+#include "web_modules/admin_panel/admin_node.h"
 
 #include "core/containers/vector.h"
 #include "core/string.h"

@@ -1,17 +1,13 @@
 #ifndef CCMS_ROOT_H
 #define CCMS_ROOT_H
 
-//#include "core/http/web_application.h"
+//#include "web/http/web_application.h"
 #include "core/object.h"
-#include "core/http/web_root.h"
+#include "web/http/web_root.h"
 
 #undef LOG_TRACE
 #undef LOG_WARN
 
-#include "modules/list_page/list_page.h"
-#include "modules/message_page/message_page.h"
-#include "modules/paged_article/paged_article.h"
-#include "modules/paged_list/paged_list.h"
 #include "page_manager/page_manager.h"
 
 class AdminPanel;

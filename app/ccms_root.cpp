@@ -1,24 +1,24 @@
 #include "ccms_root.h"
 
-#include "core/http/request.h"
+#include "web/http/request.h"
 
 #include <iostream>
 
-#include "core/file_cache.h"
+#include "web/file_cache.h"
 
-#include "core/database/database_manager.h"
+#include "database/database_manager.h"
 
-#include "core/html/html_builder.h"
-#include "core/http/csrf_token.h"
-#include "core/http/http_session.h"
-#include "core/http/session_manager.h"
+#include "web/html/html_builder.h"
+#include "web/http/csrf_token.h"
+#include "web/http/http_session.h"
+#include "web/http/session_manager.h"
 
-#include "modules/users/user.h"
-//#include "modules/users/user_controller.h"
-#include "modules/rbac_users/rbac_user_controller.h"
+#include "web_modules/users/user.h"
+//#include "web_modules/users/user_controller.h"
+#include "web_modules/rbac_users/rbac_user_controller.h"
 
-#include "modules/admin_panel/admin_panel.h"
-#include "modules/rbac/rbac_controller.h"
+#include "web_modules/admin_panel/admin_panel.h"
+#include "web_modules/rbac/rbac_controller.h"
 
 #include "ccms_user_controller.h"
 
