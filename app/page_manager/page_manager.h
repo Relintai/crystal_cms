@@ -12,6 +12,16 @@ class FormValidator;
 class Page;
 class PageContent;
 
+// Handle the pages with nodes
+//Add rw lock for when then need to change
+
+// PageManager
+//   Page1 (uri)
+//     TextContent (TextContentNode) -> contains the editor, and handles it's table directly (Controller - Model - View)
+//     ImageContent (ImageContentNode) -> contains the editor code, and handles it's table directly
+//   Page2
+//etc
+
 class PageManager : public AdminNode {
 	RCPP_OBJECT(PageManager, AdminNode);
 
