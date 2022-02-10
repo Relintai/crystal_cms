@@ -49,6 +49,7 @@ void CCMSRoot::handle_request_main(Request *request) {
 		return;
 	}
 
+	request->push_path();
 	handler->handle_request_main(request);
 }
 
